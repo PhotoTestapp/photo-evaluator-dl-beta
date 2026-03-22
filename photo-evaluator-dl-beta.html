@@ -710,7 +710,6 @@
       }
       .page-sub,
       .section-sub,
-      .field-note,
       .dropzone p,
       .hero-meta,
       .note {
@@ -771,10 +770,6 @@
       .welcome-panel, .panel { padding: 16px; }
       .step-card { padding: 14px; }
       .step-card h3 { font-size: 0.95rem; }
-      .field-input {
-        padding: 12px 14px;
-        font-size: 0.94rem;
-      }
       .btn,
       .file-label {
         padding: 14px 18px;
@@ -841,14 +836,8 @@
 
     <section class="layout">
       <div class="panel">
-        <h2 class="section-title">DL設定と画像選択</h2>
-        <p class="section-sub">GitHub Pages は静的配信なので、DL 推論は外部 API が必要です。公開用とは別のテストページとして、ここでは DL 採点結果だけを確認します。</p>
-
-        <div class="field-wrap">
-          <label class="field-label" for="dl-api-base">DL API ベースURL</label>
-          <input id="dl-api-base" class="field-input" type="url" placeholder="例: https://your-dl-api.example.com または http://127.0.0.1:8788">
-          <p class="field-note">ローカル検証なら `http://127.0.0.1:8788`、公開運用なら公開可能な DL 推論 API を設定してください。保存すると次回も使います。</p>
-        </div>
+        <h2 class="section-title">画像選択</h2>
+        <p class="section-sub">DL 評価に使う画像を1枚選びます。結果は通常公開版や学習データへ混ざりません。</p>
 
         <div class="dropzone">
           <strong>DL版で評価する画像を選ぶ</strong>
@@ -873,7 +862,7 @@
       </div>
 
       <div class="panel" id="dl-stats">
-        <h2 class="section-title">DL採点結果</h2>
+        <h2 class="section-title">採点結果</h2>
         <p class="section-sub">DL 推論 API が返す項目別スコアと総合点を表示します。参考として通常ルールベースの点も並べますが、公開版の保存やフィードバック処理には使いません。</p>
 
         <div id="result-empty" class="empty">画像を選んで `DL版で評価する` を押すと、ここに通常評価と DL 評価の比較が表示されます。</div>
@@ -926,7 +915,6 @@
             <p class="note" id="result-note">このページは DL 評価確認専用です。Google Drive 送信・Webhook・履歴・学習保存は行いません。</p>
           </section>
 
-          <div class="comment-grid" id="comment-grid"></div>
         </div>
       </div>
     </section>
@@ -935,9 +923,7 @@
   <script>
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
     const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
-    const DEFAULT_DL_API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
-      ? `${location.protocol}//${location.host}`
-      : '';
+    const DEFAULT_DL_API_BASE = 'https://photo-evaluator-dl-api.onrender.com';
 
     const fileInput = document.getElementById('file-input');
     const evalButton = document.getElementById('eval-btn');
@@ -956,8 +942,6 @@
     const estimatedGenre = document.getElementById('estimated-genre');
     const heroMeta = document.getElementById('hero-meta');
     const scoreGrid = document.getElementById('score-grid');
-    const commentGrid = document.getElementById('comment-grid');
-    const dlApiBaseInput = document.getElementById('dl-api-base');
     const resetButton = document.getElementById('reset-btn');
     let browserMlModelPromise = null;
     let currentPreviewObjectUrl = '';
@@ -1140,10 +1124,6 @@
       };
     }
 
-    function getStoredDlApiBase() {
-      return localStorage.getItem(DL_API_STORAGE_KEY) || DEFAULT_DL_API_BASE;
-    }
-
     function normalizeDlApiBase(value) {
       const raw = String(value || '').trim();
       if (!raw) return '';
@@ -1155,19 +1135,7 @@
     }
 
     function getDlApiBase() {
-      return normalizeDlApiBase(dlApiBaseInput.value) || normalizeDlApiBase(getStoredDlApiBase());
-    }
-
-    function saveDlApiBase() {
-      const normalized = normalizeDlApiBase(dlApiBaseInput.value);
-      if (!normalized) {
-        localStorage.removeItem(DL_API_STORAGE_KEY);
-        refreshApiChip();
-        return;
-      }
-      localStorage.setItem(DL_API_STORAGE_KEY, normalized);
-      dlApiBaseInput.value = normalized;
-      refreshApiChip();
+      return normalizeDlApiBase(localStorage.getItem(DL_API_STORAGE_KEY) || DEFAULT_DL_API_BASE) || DEFAULT_DL_API_BASE;
     }
 
     function refreshApiChip(kind = '') {
@@ -1693,26 +1661,9 @@
       }).join('');
     }
 
-    function renderCommentGrid(normalComments, compareComments, compareLabel = 'DLコメント') {
-      const cards = [
-        { label: '通常コメント', comments: normalComments },
-        { label: compareLabel, comments: compareComments },
-      ];
-
-      commentGrid.innerHTML = cards.map(card => `
-        <section class="comment-card">
-          <h3>${card.label}</h3>
-          <p><strong>良い点</strong>${card.comments.strength}</p>
-          <p><strong>改善点</strong>${card.comments.improvement}</p>
-          <p><strong>総評</strong>${card.comments.overall}</p>
-        </section>
-      `).join('');
-    }
-
     function renderResult(analysis, dl) {
       const ruleScore = Number(analysis.scores.totalScore || 0);
       const compareLabel = dl.engine === 'ml' ? 'ML' : 'DL';
-      const compareCommentLabel = dl.engine === 'ml' ? 'MLコメント' : 'DLコメント';
       const scoreDelta = round(Number(dl.predictedDelta || (Number(dl.predictedTotalScore || ruleScore) - ruleScore)), 1);
       const predictedScores = {};
       Object.entries(DL_SCORE_KEY_MAP).forEach(([sourceKey, scoreKey]) => {
@@ -1727,8 +1678,6 @@
         totalScore: predictedScores.totalScore ?? round(Number(dl.predictedTotalScore ?? ruleScore), 1),
       };
 
-      const normalComments = generateCommentsFromAnalysis(analysis.scores, analysis.metrics, buildImprovementSignals(analysis.metrics, analysis.scores));
-      const dlComments = generateCommentsFromAnalysis(dlScores, analysis.metrics, buildImprovementSignals(analysis.metrics, dlScores));
       const estimatedGenreCode = dl.genre || estimateGenreFromMetrics(analysis.metrics, dlScores);
 
       resultEmpty.style.display = 'none';
@@ -1756,7 +1705,6 @@
         dl.validationMae == null ? '' : `検証MAE ${round(Number(dl.validationMae), 3)}`,
       ].filter(Boolean).join(' / ');
       renderScoreGrid(dlScores);
-      renderCommentGrid(normalComments, dlComments, compareCommentLabel);
       document.getElementById('result-note').textContent = [
         'このページは DL 評価専用です。保存・履歴・フィードバック送信には混ざりません。',
         dl.engine === 'ml'
@@ -1809,15 +1757,7 @@
       }
     }
 
-    dlApiBaseInput.value = getStoredDlApiBase();
-    dlApiBaseInput.addEventListener('change', () => {
-      saveDlApiBase();
-      void refreshApiStatus();
-    });
-    dlApiBaseInput.addEventListener('blur', () => {
-      saveDlApiBase();
-      void refreshApiStatus();
-    });
+    localStorage.setItem(DL_API_STORAGE_KEY, DEFAULT_DL_API_BASE);
 
     previewImage.addEventListener('error', () => {
       setStatus('プレビュー表示に失敗しましたが、画像は選択されています。DL版で評価は実行できます。', 'error');
