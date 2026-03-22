@@ -1392,7 +1392,7 @@
 
     function setPreview(file, previewSrc = '') {
       currentFile = file;
-      currentFileDataUrl = '';
+      currentFileDataUrl = previewSrc || '';
       clearPreviewObjectUrl();
       currentPreviewObjectUrl = previewSrc || URL.createObjectURL(file);
       previewImage.src = currentPreviewObjectUrl;
@@ -1515,16 +1515,20 @@
       setStatus('DL版で採点しています...');
 
       try {
-        const imageDataUrl = currentFileDataUrl || await readFileAsDataURL(currentFile);
-        const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageDataUrl);
-        const analysis = await analyzeImageFile(currentFile, imageDataUrl);
+        const imageSource = currentFileDataUrl || currentPreviewObjectUrl || await readFileAsDataURL(currentFile);
+        setStatus('画像を解析しています...');
+        const analysis = await analyzeImageFile(currentFile, imageSource);
+        setStatus('DL用の画像を準備しています...');
+        const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageSource);
         const ruleScore = Math.round(Number(analysis.scores.totalScore || 0));
         let dl;
         try {
+          setStatus('DL APIへ送信しています...');
           dl = await requestDlPrediction(dlSafeImageDataUrl, ruleScore);
           dl.engine = 'dl';
         } catch (dlError) {
           console.warn('DL prediction failed, falling back to ML', dlError);
+          setStatus('DLが使えないため、MLへ切り替えています...');
           const mlPrediction = await predictWithBrowserModel(analysis.metrics, analysis.scores);
           dl = {
             ...mlPrediction,
@@ -1539,7 +1543,7 @@
         }
       } catch (error) {
         console.error(error);
-        setStatus(error.message || 'DL版の採点に失敗しました', 'error');
+        setStatus(`DL版の採点に失敗しました: ${error.message || error}`, 'error');
       } finally {
         evalButton.disabled = false;
       }
