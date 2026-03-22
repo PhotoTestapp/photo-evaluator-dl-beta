@@ -886,6 +886,10 @@
                 <strong>自動調整</strong>
                 <span id="dl-delta-score">-</span>
               </div>
+              <div class="method-box">
+                <strong>推定カテゴリ</strong>
+                <span id="estimated-genre">-</span>
+              </div>
             </div>
             <p class="note" id="result-note">このページは DL 評価確認専用です。Google Drive 送信・Webhook・履歴・学習保存は行いません。</p>
           </section>
@@ -917,6 +921,7 @@
     const methodBadge = document.getElementById('method-badge');
     const methodMode = document.getElementById('method-mode');
     const methodVersion = document.getElementById('method-version');
+    const estimatedGenre = document.getElementById('estimated-genre');
     const heroMeta = document.getElementById('hero-meta');
     const scoreGrid = document.getElementById('score-grid');
     const commentGrid = document.getElementById('comment-grid');
@@ -942,6 +947,15 @@
       subject: 'subjectScore',
       impact: 'impressionScore',
       total: 'totalScore',
+    };
+
+    const GENRE_LABELS = {
+      portrait: '人物',
+      landscape: '風景',
+      animal: '動物',
+      flora: '花・植物',
+      food: '食べ物',
+      other: 'その他',
     };
 
     const ITEM_COMMENT_MAP = {
@@ -1513,6 +1527,35 @@
       return signals;
     }
 
+    function estimateGenreFromMetrics(metrics, scores) {
+      const aspectRatio = metrics.width / Math.max(1, metrics.height);
+      const centeredSubject = metrics.subjectCenterSupport >= 0.58;
+      const focusedSubject = metrics.subjectConcentration >= 0.08;
+      const scenicSpread = metrics.subjectConcentration <= 0.075 && metrics.backgroundInformation >= 0.42;
+
+      if (aspectRatio >= 1.18 && scenicSpread) {
+        return 'landscape';
+      }
+      if (focusedSubject && centeredSubject && metrics.backgroundInformation <= 0.72 && scores.subjectScore >= 72) {
+        if (metrics.saturationRatio >= 0.16 && scores.colorScore >= 70) {
+          return 'flora';
+        }
+        if (metrics.brightnessMean >= 92 && metrics.brightnessMean <= 176 && scores.technicalScore >= 60) {
+          return 'portrait';
+        }
+      }
+      if (focusedSubject && centeredSubject && metrics.backgroundInformation <= 0.76 && metrics.saturationRatio >= 0.1) {
+        return 'food';
+      }
+      if (focusedSubject && metrics.subjectCenterSupport >= 0.46 && scores.technicalScore >= 66) {
+        return 'animal';
+      }
+      if (metrics.saturationRatio >= 0.18 && scores.colorScore >= 74 && focusedSubject) {
+        return 'flora';
+      }
+      return 'other';
+    }
+
     function generateCommentsFromAnalysis(scores, metrics, improvementSignals) {
       const ranked = Object.entries(scores)
         .filter(([key]) => SCORE_ITEMS.some(item => item.key === key))
@@ -1654,6 +1697,7 @@
 
       const normalComments = generateCommentsFromAnalysis(analysis.scores, analysis.metrics, buildImprovementSignals(analysis.metrics, analysis.scores));
       const dlComments = generateCommentsFromAnalysis(dlScores, analysis.metrics, buildImprovementSignals(analysis.metrics, dlScores));
+      const estimatedGenreCode = dl.genre || estimateGenreFromMetrics(analysis.metrics, dlScores);
 
       resultEmpty.style.display = 'none';
       resultCard.style.display = 'block';
@@ -1661,6 +1705,7 @@
       document.getElementById('dl-total-score').textContent = String(dlScores.totalScore);
       document.getElementById('dl-delta-score').textContent = `${scoreDelta > 0 ? '+' : ''}${scoreDelta}点`;
       methodVersion.textContent = dl.modelVersion || dl.modelType || '未設定';
+      estimatedGenre.textContent = GENRE_LABELS[estimatedGenreCode] || 'その他';
 
       if (dl.engine === 'ml') {
         resultBadge.textContent = dl.usedModel ? 'MLフォールバック' : '標準評価';
