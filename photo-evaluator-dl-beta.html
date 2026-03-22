@@ -1488,7 +1488,13 @@
         resultBadge.textContent = dl.usedModel ? 'DL推論あり' : 'DL未使用';
         resultBadge.className = `badge ${dl.usedModel ? 'green' : 'amber'}`;
       }
-      document.querySelector('.score-box .score-label + .score-value.blue')?.parentElement?.querySelector('.score-label').textContent = `${compareLabel}版の総合点`;
+      const compareTotalLabel = document.querySelector('.score-box .score-value.blue');
+      if (compareTotalLabel && compareTotalLabel.parentElement) {
+        const compareTotalLabelText = compareTotalLabel.parentElement.querySelector('.score-label');
+        if (compareTotalLabelText) {
+          compareTotalLabelText.textContent = `${compareLabel}版の総合点`;
+        }
+      }
       renderCompareMatrix(analysis.scores, dlScores, compareLabel);
       renderCommentGrid(normalComments, dlComments, compareCommentLabel);
       document.getElementById('result-note').textContent = [
