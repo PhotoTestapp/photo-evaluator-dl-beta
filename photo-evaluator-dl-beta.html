@@ -1059,6 +1059,8 @@
     const DL_BETA_STATS_STORAGE_KEY = 'photo_eval_dl_beta_only_saved_results_v1';
     const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
     const DEFAULT_DL_API_BASE = 'https://photo-evaluator-dl-api.onrender.com';
+    const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwJM6moHlemxgjr4yLo_HOu8fgT0sdSbgy-QUBemlmMPp297Ok9UrASZ8qzFUY-0AACGQ/exec';
+    const DELIVERY_MAX_SIDE = 1920;
 
     const fileInput = document.getElementById('file-input');
     const evalButton = document.getElementById('eval-btn');
@@ -1313,6 +1315,80 @@
       return data;
     }
 
+    function buildDrivePayload(file, analysis, dl, dlScores, estimatedGenreCode, imageBase64) {
+      const createdAt = new Date().toISOString();
+      const scoreDelta = round(Number(dl.predictedDelta || (Number(dlScores.totalScore || 0) - Number(analysis.scores.totalScore || 0))), 1);
+      return {
+        webhookKey: '',
+        destination: 'drive',
+        toEmail: '',
+        fileName: file?.name || `photo-eval-beta-${createdAt}.jpg`,
+        createdAt,
+        imageBase64,
+        imageContentType: 'image/jpeg',
+        evaluation: {
+          compositionScore: Number(dlScores.compositionScore || 0),
+          lightScore: Number(dlScores.lightScore || 0),
+          technicalScore: Number(dlScores.technicalScore || 0),
+          subjectScore: Number(dlScores.subjectScore || 0),
+          colorScore: Number(dlScores.colorScore || 0),
+          brightnessScore: '',
+          focusScore: '',
+          expressionScore: '',
+          backgroundScore: '',
+          cleanlinessScore: '',
+          organizationScore: '',
+          informationScore: '',
+          impressionScore: Number(dlScores.impressionScore || 0),
+          totalScore: Number(dlScores.totalScore || 0),
+          strengthsComment: '',
+          improvementComment: '',
+          overallComment: '',
+          analysisMeta: {
+            source: 'photo-evaluator-dl-beta',
+            engine: dl.engine || 'rule',
+            modelVersion: dl.modelVersion || dl.modelType || '',
+            predictedDelta: scoreDelta,
+            validationMae: dl.validationMae == null ? '' : round(Number(dl.validationMae), 3),
+            estimatedGenre: estimatedGenreCode,
+            brightnessMean: round(Number(analysis.metrics?.brightnessMean || 0)),
+            whiteClipRatio: round(Number(analysis.metrics?.overexposedRatio || 0) * 100, 1),
+            blackClipRatio: round(Number(analysis.metrics?.underexposedRatio || 0) * 100, 1),
+            contrast: round(Number(analysis.metrics?.contrast || 0), 2),
+            sharpnessRaw: round(Number(analysis.metrics?.sharpnessRaw || 0), 1),
+            noiseEstimate: round(Number(analysis.metrics?.noiseEstimate || 0), 1),
+          },
+          improvementSignals: [],
+        },
+      };
+    }
+
+    async function saveEvaluationToDrive(file, imageSource, analysis, dl, dlScores, estimatedGenreCode) {
+      const deliveryImage = await resizeImageForDelivery(imageSource);
+      const payload = buildDrivePayload(file, analysis, dl, dlScores, estimatedGenreCode, deliveryImage.base64);
+      const response = await fetch(DEFAULT_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload),
+      });
+      const rawText = await response.text();
+      let data = null;
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        throw new Error(`保存先からの返答を読み取れませんでした (${rawText.slice(0, 120)})`);
+      }
+      if (!response.ok) {
+        throw new Error(data?.message ? `保存先エラー: ${data.message}` : `保存先エラー: HTTP ${response.status}`);
+      }
+      if (!data?.success || !data?.savedToDrive) {
+        throw new Error(data?.driveError || data?.message || 'Google Drive への保存に失敗しました');
+      }
+      return data;
+    }
+
     function formatBytes(bytes) {
       if (!Number.isFinite(bytes) || bytes <= 0) return '0B';
       const units = ['B', 'KB', 'MB', 'GB'];
@@ -1323,6 +1399,11 @@
         index++;
       }
       return `${round(value, value >= 10 ? 0 : 1)}${units[index]}`;
+    }
+
+    function dataUrlToBase64(dataUrl) {
+      const parts = String(dataUrl || '').split(',');
+      return parts.length > 1 ? parts[1] : '';
     }
 
     async function convertToDlSafeDataUrl(source) {
@@ -1337,6 +1418,26 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(image, 0, 0, width, height);
       return canvas.toDataURL('image/jpeg', 0.92);
+    }
+
+    async function resizeImageForDelivery(source) {
+      const image = await loadImageElement(source);
+      const longestSide = Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height);
+      const scale = Math.min(1, DELIVERY_MAX_SIDE / Math.max(1, longestSide));
+      const width = Math.max(48, Math.round((image.naturalWidth || image.width) * scale));
+      const height = Math.max(48, Math.round((image.naturalHeight || image.height) * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      return {
+        dataUrl,
+        base64: dataUrlToBase64(dataUrl),
+        width,
+        height,
+      };
     }
 
     function withTimeout(promise, ms, message) {
@@ -2022,6 +2123,10 @@
       saveStatsRecord(savedRecord);
       renderStats();
       void saveGlobalEvaluation(savedRecord);
+      return {
+        dlScores,
+        estimatedGenreCode,
+      };
     }
 
     async function runDlTest() {
@@ -2052,12 +2157,20 @@
             reason: dlError?.message || 'DL推論が利用できません',
           };
         }
-        renderResult(analysis, dl);
+        const rendered = renderResult(analysis, dl);
         if (dl.engine === 'ml') {
           setStatus(dl.usedModel ? 'DLが使えなかったため、ML補正で表示しました。' : 'DLとMLが使えなかったため、標準評価で表示しました。', dl.usedModel ? 'success' : '');
         } else {
           setStatus(dl.usedModel ? '採点が完了しました。' : 'DLモデルを使わず表示しました。', dl.usedModel ? 'success' : '');
         }
+        void saveEvaluationToDrive(currentFile, imageSource, analysis, dl, rendered.dlScores, rendered.estimatedGenreCode)
+          .then(() => {
+            setStatus('採点が完了しました。Google Driveへ保存しました。', 'success');
+          })
+          .catch(error => {
+            console.error(error);
+            setStatus(`採点は完了しましたが、Google Drive への保存に失敗しました: ${error.message || error}`, 'error');
+          });
       } catch (error) {
         console.error(error);
         setStatus(`DL版の採点に失敗しました: ${error.message || error}`, 'error');
