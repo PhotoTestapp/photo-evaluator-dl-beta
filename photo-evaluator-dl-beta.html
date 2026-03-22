@@ -1056,7 +1056,7 @@
 
   <script>
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
-    const DL_BETA_STATS_STORAGE_KEY = 'photo_eval_dl_beta_saved_results';
+    const DL_BETA_STATS_STORAGE_KEY = 'photo_eval_dl_beta_only_saved_results_v1';
     const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
     const PUBLIC_STATS_PATH = './photo_eval_public_stats.json';
     const DEFAULT_DL_API_BASE = 'https://photo-evaluator-dl-api.onrender.com';
@@ -1999,7 +1999,6 @@
         const imageSource = currentFileDataUrl || currentPreviewObjectUrl || await readFileAsDataURL(currentFile);
         setStatus('画像を解析しています...');
         const analysis = await analyzeImageFile(currentFile, imageSource);
-        setStatus('DL用の画像を準備しています...');
         const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageSource);
         const ruleScore = Math.round(Number(analysis.scores.totalScore || 0));
         let dl;
