@@ -1486,6 +1486,138 @@
       });
     }
 
+    function readFileAsArrayBuffer(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = event => resolve(event.target.result);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function parseExifValue(view, tiffOffset, valueOffset, type, count, littleEndian) {
+      const typeSizes = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8 };
+      const unitSize = typeSizes[type];
+      if (!unitSize) return null;
+      const totalSize = unitSize * count;
+      const actualOffset = totalSize <= 4 ? valueOffset : tiffOffset + valueOffset;
+
+      const readUnsigned = offset => {
+        if (type === 1 || type === 7) return view.getUint8(offset);
+        if (type === 3) return view.getUint16(offset, littleEndian);
+        if (type === 4) return view.getUint32(offset, littleEndian);
+        if (type === 5) {
+          const numerator = view.getUint32(offset, littleEndian);
+          const denominator = view.getUint32(offset + 4, littleEndian);
+          return denominator ? numerator / denominator : 0;
+        }
+        if (type === 9) return view.getInt32(offset, littleEndian);
+        if (type === 10) {
+          const numerator = view.getInt32(offset, littleEndian);
+          const denominator = view.getInt32(offset + 4, littleEndian);
+          return denominator ? numerator / denominator : 0;
+        }
+        return null;
+      };
+
+      if (type === 2) {
+        let text = '';
+        for (let index = 0; index < count; index += 1) {
+          const charCode = view.getUint8(actualOffset + index);
+          if (!charCode) break;
+          text += String.fromCharCode(charCode);
+        }
+        return text.trim();
+      }
+
+      if (count === 1) return readUnsigned(actualOffset);
+
+      const values = [];
+      for (let index = 0; index < count; index += 1) {
+        values.push(readUnsigned(actualOffset + index * unitSize));
+      }
+      return values;
+    }
+
+    function collectExifTags(view, tiffOffset, ifdOffset, littleEndian, map, output = {}) {
+      if (!ifdOffset) return output;
+      const entryCount = view.getUint16(tiffOffset + ifdOffset, littleEndian);
+      for (let index = 0; index < entryCount; index += 1) {
+        const entryOffset = tiffOffset + ifdOffset + 2 + index * 12;
+        const tag = view.getUint16(entryOffset);
+        const type = view.getUint16(entryOffset + 2, littleEndian);
+        const count = view.getUint32(entryOffset + 4, littleEndian);
+        const valueOffset = view.getUint32(entryOffset + 8, littleEndian);
+        const key = map[tag];
+        if (!key) continue;
+        output[key] = parseExifValue(view, tiffOffset, valueOffset, type, count, littleEndian);
+      }
+      return output;
+    }
+
+    async function extractExifMetadataFromFile(file) {
+      const mimeType = (file.type || '').toLowerCase();
+      const name = String(file.name || '').toLowerCase();
+      const isJpeg = mimeType === 'image/jpeg' || mimeType === 'image/jpg' || name.endsWith('.jpg') || name.endsWith('.jpeg');
+      if (!isJpeg) return {};
+
+      try {
+        const buffer = await readFileAsArrayBuffer(file);
+        const view = new DataView(buffer);
+        if (view.getUint16(0) !== 0xffd8) return {};
+        let offset = 2;
+        while (offset + 4 < view.byteLength) {
+          const marker = view.getUint16(offset);
+          offset += 2;
+          if (marker === 0xffda || marker === 0xffd9) break;
+          const segmentLength = view.getUint16(offset);
+          if (marker === 0xffe1 && view.getUint32(offset + 2) === 0x45786966) {
+            const tiffOffset = offset + 8;
+            const littleEndian = view.getUint16(tiffOffset) === 0x4949;
+            const firstIfdOffset = view.getUint32(tiffOffset + 4, littleEndian);
+            const baseTags = {
+              0x010f: 'Make',
+              0x0110: 'Model',
+              0x8769: 'ExifIFDPointer',
+            };
+            const exifTags = {
+              0x829a: 'ExposureTime',
+              0x829d: 'FNumber',
+              0x8827: 'ISO',
+              0x9003: 'DateTimeOriginal',
+              0x920a: 'FocalLength',
+              0xa405: 'FocalLengthIn35mmFormat',
+              0xa434: 'LensModel',
+            };
+            const base = collectExifTags(view, tiffOffset, firstIfdOffset, littleEndian, baseTags, {});
+            const exifIfdPointer = Number(base.ExifIFDPointer || 0);
+            const exif = exifIfdPointer
+              ? collectExifTags(view, tiffOffset, exifIfdPointer, littleEndian, exifTags, {})
+              : {};
+            const merged = { ...base, ...exif };
+            return {
+              exif: merged,
+              exifSummary: {
+                cameraMake: merged.Make || '',
+                cameraModel: merged.Model || '',
+                lensModel: merged.LensModel || '',
+                iso: merged.ISO ?? null,
+                aperture: merged.FNumber ?? null,
+                exposureTime: merged.ExposureTime ?? null,
+                focalLength: merged.FocalLength ?? null,
+                focalLength35mm: merged.FocalLengthIn35mmFormat ?? null,
+                dateTimeOriginal: merged.DateTimeOriginal || '',
+              },
+            };
+          }
+          offset += segmentLength;
+        }
+      } catch (error) {
+        console.warn('DL beta EXIF extraction skipped', error);
+      }
+      return {};
+    }
+
     async function loadImageElement(source) {
       const src = typeof source === 'string' ? source : URL.createObjectURL(source);
       const shouldRevoke = typeof source !== 'string';
@@ -2109,7 +2241,7 @@
       }).join('');
     }
 
-    function renderResult(analysis, dl) {
+    function renderResult(analysis, dl, savePayload = null) {
       const ruleScore = Number(analysis.scores.totalScore || 0);
       const compareLabel = dl.engine === 'ml' ? 'ML' : 'DL';
       const scoreDelta = round(Number(dl.predictedDelta || (Number(dl.predictedTotalScore || ruleScore) - ruleScore)), 1);
@@ -2153,8 +2285,10 @@
         dl.validationMae == null ? '' : `検証MAE ${round(Number(dl.validationMae), 3)}`,
       ].filter(Boolean).join(' / ');
       renderScoreGrid(dlScores);
-      const savedRecord = {
+      const localStatsRecord = {
         savedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        imageId: `dl-beta-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
         engine: dl.engine || 'rule',
         totalScore: Number(dlScores.totalScore || 0),
         compositionScore: Number(dlScores.compositionScore || 0),
@@ -2166,7 +2300,13 @@
         genre: estimatedGenreCode,
         modelVersion: dl.modelVersion || dl.modelType || '',
       };
-      saveStatsRecord(savedRecord);
+      const savedRecord = {
+        ...localStatsRecord,
+        fileName: currentFile?.name || '',
+        image_metadata: savePayload?.image_metadata || {},
+        originalFile: savePayload?.originalFile || null,
+      };
+      saveStatsRecord(localStatsRecord);
       renderStats();
       void saveGlobalEvaluation(savedRecord);
       return {
@@ -2185,10 +2325,12 @@
       setStatus('採点中...');
 
       try {
-        const imageSource = currentFileDataUrl || currentPreviewObjectUrl || await readFileAsDataURL(currentFile);
+        const originalFileDataUrl = currentFileDataUrl || await readFileAsDataURL(currentFile);
+        const imageSource = originalFileDataUrl || currentPreviewObjectUrl || '';
         setStatus('画像を解析しています...');
         const analysis = await analyzeImageFile(currentFile, imageSource);
         const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageSource);
+        const browserExifMetadata = await extractExifMetadataFromFile(currentFile);
         const ruleScore = Math.round(Number(analysis.scores.totalScore || 0));
         let dl;
         try {
@@ -2203,7 +2345,15 @@
             reason: dlError?.message || 'DL推論が利用できません',
           };
         }
-        const rendered = renderResult(analysis, dl);
+        const rendered = renderResult(analysis, dl, {
+          image_metadata: browserExifMetadata,
+          originalFile: {
+            base64: dataUrlToBase64(originalFileDataUrl),
+            fileName: currentFile.name || '',
+            mimeType: currentFile.type || '',
+            size: Number(currentFile.size || 0),
+          },
+        });
         if (dl.engine === 'ml') {
           setStatus(dl.usedModel ? 'DLが使えなかったため、ML補正で表示しました。' : 'DLとMLが使えなかったため、標準評価で表示しました。', dl.usedModel ? 'success' : '');
         } else {
