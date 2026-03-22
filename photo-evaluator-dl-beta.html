@@ -359,24 +359,101 @@
     }
 
     .result-card {
+      display: grid;
+      gap: 18px;
+    }
+
+    .result-section-title {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .result-hero {
       background: linear-gradient(180deg, rgba(252,253,255,0.98), rgba(245,249,255,0.98));
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px;
+      border-radius: 26px;
+      padding: 28px 28px 26px;
+      box-shadow: var(--shadow);
     }
 
-    .result-head {
+    .hero-label {
+      color: var(--text-dim);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+
+    .hero-score-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .hero-score {
+      font-size: clamp(4rem, 11vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: -0.08em;
+      font-weight: 900;
+      color: #f0a20b;
+    }
+
+    .hero-score-unit {
+      color: var(--text-dim);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      background: rgba(93,141,247,0.12);
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .hero-meta {
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      line-height: 1.7;
+    }
+
+    .result-toolbar {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
-      align-items: start;
-      margin-bottom: 18px;
+      flex-wrap: wrap;
     }
 
-    .result-head h2 {
+    .result-toolbar .result-section-title {
       margin: 0;
-      font-size: 1.45rem;
+    }
+
+    .ghost-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.92);
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ghost-btn:hover {
       color: var(--text);
+      background: rgba(255,255,255,0.98);
     }
 
     .badge {
@@ -396,115 +473,117 @@
     .badge.amber { color: #bf7b00; }
     .badge.red { color: var(--red); }
 
-    .score-panels {
+    .score-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
-      margin-bottom: 16px;
     }
 
-    .score-box {
+    .score-tile {
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.98);
+      padding: 16px 18px;
+      box-shadow: 0 10px 24px rgba(68, 101, 173, 0.07);
     }
 
-    .score-label {
-      display: block;
-      color: var(--text-muted);
-      font-size: 0.86rem;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .score-value {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -0.05em;
-      color: var(--text);
-    }
-
-    .score-value.blue { color: var(--blue); }
-
-    .compare-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .compare-item {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.96);
-    }
-
-    .compare-item strong {
-      display: block;
-      color: var(--text-muted);
-      font-size: 0.84rem;
-      margin-bottom: 6px;
-    }
-
-    .compare-item span {
-      font-size: 1.45rem;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      color: var(--text);
-    }
-
-    .matrix-note,
-    .note {
-      margin: 14px 0 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .compare-matrix {
-      margin-top: 18px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .compare-matrix-row {
-      display: grid;
-      grid-template-columns: minmax(92px, 1.15fr) repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .compare-matrix-cell {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.96);
-      min-height: 64px;
+    .score-tile-head {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .compare-matrix-head .compare-matrix-cell {
-      background: rgba(238, 245, 255, 0.95);
+    .score-tile-label {
+      font-size: 0.95rem;
       font-weight: 800;
       color: var(--text-muted);
     }
 
-    .compare-matrix-label {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      font-weight: 700;
+    .score-tile-value {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #ee9b14;
+      letter-spacing: -0.04em;
     }
 
-    .compare-matrix-value {
-      font-size: 1.35rem;
+    .score-bar-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #dfe8fa;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f0a20b 0%, #f4b43f 100%);
+      width: 0%;
+      transition: width 220ms ease;
+    }
+
+    .score-bar-fill.blue {
+      background: linear-gradient(90deg, #5d8df7 0%, #7aa4ff 100%);
+    }
+
+    .score-bar-fill.green {
+      background: linear-gradient(90deg, #31bf73 0%, #5add96 100%);
+    }
+
+    .method-card {
+      background: linear-gradient(180deg, rgba(252,253,255,0.98), rgba(245,249,255,0.98));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .method-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .method-title {
+      font-size: 1.05rem;
       font-weight: 900;
-      letter-spacing: -0.04em;
       color: var(--text);
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .method-box {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(255,255,255,0.96);
+    }
+
+    .method-box strong {
+      display: block;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .method-box span {
+      color: var(--text);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
     }
 
     .comment-grid {
@@ -572,8 +651,7 @@
       .page { padding: 24px 16px 72px; }
       nav { padding: 0 16px; }
       .panel, .welcome-panel { padding: 20px; border-radius: var(--radius-lg); }
-      .score-panels, .compare-grid, .comment-grid { grid-template-columns: 1fr; }
-      .compare-matrix-row { grid-template-columns: 1fr; }
+      .comment-grid, .score-grid, .method-grid { grid-template-columns: 1fr; }
       .preview-card img { max-height: 320px; }
     }
   </style>
@@ -659,46 +737,50 @@
         <div id="result-empty" class="empty">画像を選んで `DL版で評価する` を押すと、ここに通常評価と DL 評価の比較が表示されます。</div>
 
         <div id="result-card" class="result-card" style="display:none">
-          <div class="result-head">
-            <h2>DL採点比較</h2>
-            <span class="badge" id="result-badge">DL未実行</span>
+          <div class="result-toolbar">
+            <h3 class="result-section-title">✦ チェック結果</h3>
+            <button id="reset-btn" class="ghost-btn" type="button">別の写真をチェックする</button>
           </div>
 
-          <div class="score-panels">
-            <div class="score-box">
-              <span class="score-label">通常の総合点</span>
-              <div class="score-value" id="rule-total-score">-</div>
+          <section class="result-hero">
+            <div class="hero-label">TOTAL SCORE</div>
+            <div class="hero-score-row">
+              <div class="hero-score" id="dl-total-score">-</div>
+              <div class="hero-score-unit">/100</div>
             </div>
-            <div class="score-box">
-              <span class="score-label">DL版の総合点</span>
-              <div class="score-value blue" id="dl-total-score">-</div>
-            </div>
-          </div>
+            <div class="hero-badge" id="result-badge">DL未実行</div>
+            <div class="hero-meta" id="hero-meta">通常評価とDL/ML評価の差分がここに表示されます。</div>
+          </section>
 
-          <div class="compare-grid">
-            <div class="compare-item">
-              <strong>DL補正差分</strong>
-              <span id="dl-delta-score">-</span>
-            </div>
-            <div class="compare-item">
-              <strong>DL学習件数</strong>
-              <span id="dl-sample-count">-</span>
-            </div>
-            <div class="compare-item">
-              <strong>DL検証MAE</strong>
-              <span id="dl-validation-mae">-</span>
-            </div>
-            <div class="compare-item">
-              <strong>モデル種別</strong>
-              <span id="dl-model-type">-</span>
-            </div>
-          </div>
+          <section class="score-grid" id="score-grid"></section>
 
-          <div class="compare-matrix" id="compare-matrix"></div>
-          <p class="matrix-note">左が現在のルールベース、右が DL モデルの項目別予測です。DL 側が返せない項目は通常値を引き継ぎません。表示差分をそのまま比較できます。</p>
+          <section class="method-card">
+            <div class="method-header">
+              <div class="method-title">結果の出し方</div>
+              <span class="badge" id="method-badge">DLベータ</span>
+            </div>
+            <div class="method-grid">
+              <div class="method-box">
+                <strong>現在のチェック方式</strong>
+                <span id="method-mode">DL評価</span>
+              </div>
+              <div class="method-box">
+                <strong>調整データの版</strong>
+                <span id="method-version">-</span>
+              </div>
+              <div class="method-box">
+                <strong>標準の総合点</strong>
+                <span id="rule-total-score">-</span>
+              </div>
+              <div class="method-box">
+                <strong>自動調整</strong>
+                <span id="dl-delta-score">-</span>
+              </div>
+            </div>
+            <p class="note" id="result-note">このページは DL 評価確認専用です。Google Drive 送信・Webhook・履歴・学習保存は行いません。</p>
+          </section>
 
           <div class="comment-grid" id="comment-grid"></div>
-          <p class="note" id="result-note">このページは DL 評価確認専用です。Google Drive 送信・Webhook・履歴・学習保存は行いません。</p>
         </div>
       </div>
     </section>
@@ -722,9 +804,14 @@
     const resultEmpty = document.getElementById('result-empty');
     const resultCard = document.getElementById('result-card');
     const resultBadge = document.getElementById('result-badge');
-    const compareMatrix = document.getElementById('compare-matrix');
+    const methodBadge = document.getElementById('method-badge');
+    const methodMode = document.getElementById('method-mode');
+    const methodVersion = document.getElementById('method-version');
+    const heroMeta = document.getElementById('hero-meta');
+    const scoreGrid = document.getElementById('score-grid');
     const commentGrid = document.getElementById('comment-grid');
     const dlApiBaseInput = document.getElementById('dl-api-base');
+    const resetButton = document.getElementById('reset-btn');
     let browserMlModelPromise = null;
     let currentPreviewObjectUrl = '';
 
@@ -1397,37 +1484,28 @@
       setStatus('画像を読み込みました。DL版で評価できます。', 'success');
     }
 
-    function renderCompareMatrix(ruleScores, dlScores, comparisonLabel = 'DL') {
-      const rows = [
-        ...SCORE_ITEMS.map(item => ({
-          label: item.label,
-          normal: ruleScores[item.key],
-          dl: dlScores[item.key],
-        })),
-        {
-          label: '総合',
-          normal: ruleScores.totalScore,
-          dl: dlScores.totalScore,
-        },
-      ];
+    function getScoreTone(value) {
+      if (value >= 80) return 'green';
+      if (value >= 70) return 'blue';
+      return '';
+    }
 
-      compareMatrix.innerHTML = `
-          <div class="compare-matrix-row compare-matrix-head">
-          <div class="compare-matrix-cell">項目</div>
-          <div class="compare-matrix-cell">通常</div>
-          <div class="compare-matrix-cell">${comparisonLabel}</div>
-        </div>
-        ${rows.map(row => `
-          <div class="compare-matrix-row">
-            <div class="compare-matrix-cell">
-              <div class="compare-matrix-label">${row.label}</div>
-              <div class="compare-matrix-value">${row.label === '総合' ? 'TOTAL' : row.label}</div>
+    function renderScoreGrid(scores) {
+      scoreGrid.innerHTML = SCORE_ITEMS.map(item => {
+        const value = round(Number(scores[item.key] || 0), 1);
+        const tone = getScoreTone(value);
+        return `
+          <article class="score-tile">
+            <div class="score-tile-head">
+              <div class="score-tile-label">${item.label}</div>
+              <div class="score-tile-value">${value}</div>
             </div>
-            <div class="compare-matrix-cell"><div class="compare-matrix-value">${round(Number(row.normal), 1)}</div></div>
-            <div class="compare-matrix-cell"><div class="compare-matrix-value">${round(Number(row.dl), 1)}</div></div>
-          </div>
-        `).join('')}
-      `;
+            <div class="score-bar-track">
+              <div class="score-bar-fill ${tone}" style="width:${clamp(value, 0, 100)}%"></div>
+            </div>
+          </article>
+        `;
+      }).join('');
     }
 
     function renderCommentGrid(normalComments, compareComments, compareLabel = 'DLコメント') {
@@ -1450,6 +1528,7 @@
       const ruleScore = Number(analysis.scores.totalScore || 0);
       const compareLabel = dl.engine === 'ml' ? 'ML' : 'DL';
       const compareCommentLabel = dl.engine === 'ml' ? 'MLコメント' : 'DLコメント';
+      const scoreDelta = round(Number(dl.predictedDelta || (Number(dl.predictedTotalScore || ruleScore) - ruleScore)), 1);
       const predictedScores = {};
       Object.entries(DL_SCORE_KEY_MAP).forEach(([sourceKey, scoreKey]) => {
         const value = dl?.predictedScores?.[sourceKey];
@@ -1470,26 +1549,26 @@
       resultCard.style.display = 'block';
       document.getElementById('rule-total-score').textContent = String(ruleScore);
       document.getElementById('dl-total-score').textContent = String(dlScores.totalScore);
-      document.getElementById('dl-delta-score').textContent = `${Number(dl.predictedDelta || 0) > 0 ? '+' : ''}${round(Number(dl.predictedDelta || (dlScores.totalScore - ruleScore)), 1)}`;
-      document.getElementById('dl-sample-count').textContent = String(dl.sampleCount ?? 0);
-      document.getElementById('dl-validation-mae').textContent = dl.validationMae == null ? '—' : String(round(Number(dl.validationMae), 3));
-      document.getElementById('dl-model-type').textContent = dl.modelType || '未設定';
+      document.getElementById('dl-delta-score').textContent = `${scoreDelta > 0 ? '+' : ''}${scoreDelta}点`;
+      methodVersion.textContent = dl.modelVersion || dl.modelType || '未設定';
 
       if (dl.engine === 'ml') {
         resultBadge.textContent = dl.usedModel ? 'MLフォールバック' : '標準評価';
         resultBadge.className = `badge ${dl.usedModel ? 'amber' : 'red'}`;
+        methodBadge.textContent = dl.usedModel ? 'ML補正あり' : '標準評価';
+        methodMode.textContent = dl.usedModel ? 'MLフォールバック' : '標準評価';
       } else {
         resultBadge.textContent = dl.usedModel ? 'DL推論あり' : 'DL未使用';
         resultBadge.className = `badge ${dl.usedModel ? 'green' : 'amber'}`;
+        methodBadge.textContent = dl.usedModel ? 'DL推論あり' : 'DL未使用';
+        methodMode.textContent = dl.usedModel ? 'DL評価' : '標準評価';
       }
-      const compareTotalLabel = document.querySelector('.score-box .score-value.blue');
-      if (compareTotalLabel && compareTotalLabel.parentElement) {
-        const compareTotalLabelText = compareTotalLabel.parentElement.querySelector('.score-label');
-        if (compareTotalLabelText) {
-          compareTotalLabelText.textContent = `${compareLabel}版の総合点`;
-        }
-      }
-      renderCompareMatrix(analysis.scores, dlScores, compareLabel);
+      heroMeta.textContent = [
+        `通常 ${ruleScore}点 / ${compareLabel} ${dlScores.totalScore}点 / 調整 ${scoreDelta > 0 ? '+' : ''}${scoreDelta}点`,
+        `学習件数 ${dl.sampleCount ?? 0}`,
+        dl.validationMae == null ? '' : `検証MAE ${round(Number(dl.validationMae), 3)}`,
+      ].filter(Boolean).join(' / ');
+      renderScoreGrid(dlScores);
       renderCommentGrid(normalComments, dlComments, compareCommentLabel);
       document.getElementById('result-note').textContent = [
         'このページは DL 評価専用です。保存・履歴・フィードバック送信には混ざりません。',
@@ -1570,6 +1649,22 @@
 
     evalButton.addEventListener('click', () => {
       void runDlTest();
+    });
+
+    resetButton.addEventListener('click', () => {
+      currentFile = null;
+      currentFileDataUrl = '';
+      fileInput.value = '';
+      clearPreviewObjectUrl();
+      previewImage.removeAttribute('src');
+      previewName.textContent = '未選択';
+      previewSize.textContent = '-';
+      previewWrap.style.display = 'none';
+      evalButton.disabled = true;
+      resultCard.style.display = 'none';
+      resultEmpty.style.display = 'block';
+      setStatus('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     refreshApiChip();
