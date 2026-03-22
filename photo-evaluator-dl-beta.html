@@ -720,6 +720,7 @@
     const commentGrid = document.getElementById('comment-grid');
     const dlApiBaseInput = document.getElementById('dl-api-base');
     let browserMlModelPromise = null;
+    let currentPreviewObjectUrl = '';
 
     const SCORE_ITEMS = [
       { label: '構図', key: 'compositionScore' },
@@ -1370,10 +1371,19 @@
       }
     }
 
-    function setPreview(file, dataUrl) {
+    function clearPreviewObjectUrl() {
+      if (currentPreviewObjectUrl) {
+        URL.revokeObjectURL(currentPreviewObjectUrl);
+        currentPreviewObjectUrl = '';
+      }
+    }
+
+    function setPreview(file, previewSrc = '') {
       currentFile = file;
-      currentFileDataUrl = dataUrl;
-      previewImage.src = dataUrl;
+      currentFileDataUrl = '';
+      clearPreviewObjectUrl();
+      currentPreviewObjectUrl = previewSrc || URL.createObjectURL(file);
+      previewImage.src = currentPreviewObjectUrl;
       previewName.textContent = file.name;
       previewSize.textContent = formatBytes(file.size);
       previewWrap.style.display = 'grid';
@@ -1527,12 +1537,15 @@
       void refreshApiStatus();
     });
 
+    previewImage.addEventListener('error', () => {
+      setStatus('プレビュー表示に失敗しましたが、画像は選択されています。DL版で評価は実行できます。', 'error');
+    });
+
     fileInput.addEventListener('change', async event => {
       const [file] = Array.from(event.target.files || []);
       if (!file) return;
       try {
-        const dataUrl = await readFileAsDataURL(file);
-        setPreview(file, dataUrl);
+        setPreview(file);
       } catch (error) {
         console.error(error);
         setStatus(error.message || '画像の読み込みに失敗しました', 'error');
