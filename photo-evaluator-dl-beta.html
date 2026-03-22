@@ -308,7 +308,19 @@
       transform: none;
     }
 
-    .file-input { display: none; }
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
 
     .preview-wrap {
       margin-top: 18px;
@@ -616,7 +628,7 @@
         <div class="dropzone">
           <strong>DL版で評価する画像を選ぶ</strong>
           <p>JPG / JPEG / PNG / WebP / HEIF を読み込みます。ここでの結果は通常公開版や学習データへ混ざりません。</p>
-          <label class="file-label" for="file-input">画像を選択する</label>
+          <button id="file-picker-btn" class="file-label" type="button">画像を選択する</button>
           <input id="file-input" class="file-input" type="file" accept="image/*,.heic,.heif">
         </div>
 
@@ -694,6 +706,7 @@
 
     const fileInput = document.getElementById('file-input');
     const evalButton = document.getElementById('eval-btn');
+    const filePickerButton = document.getElementById('file-picker-btn');
     const previewWrap = document.getElementById('preview-wrap');
     const previewImage = document.getElementById('preview-image');
     const previewName = document.getElementById('preview-name');
@@ -1524,6 +1537,10 @@
         console.error(error);
         setStatus(error.message || '画像の読み込みに失敗しました', 'error');
       }
+    });
+
+    filePickerButton.addEventListener('click', () => {
+      fileInput.click();
     });
 
     evalButton.addEventListener('click', () => {
