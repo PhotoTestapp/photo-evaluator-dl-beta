@@ -171,7 +171,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      grid-template-columns: 1fr;
       gap: 22px;
       align-items: start;
     }
@@ -326,13 +326,7 @@
     }
 
     .preview-meta {
-      padding: 14px 16px;
-      color: var(--text-muted);
-      font-size: 0.92rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      display: none;
     }
 
     .result-card {
@@ -753,7 +747,6 @@
     }
 
     @media (max-width: 980px) {
-      .layout { grid-template-columns: 1fr; }
       .step-grid { grid-template-columns: 1fr; }
       .score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .average-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -867,10 +860,6 @@
         gap: 10px;
       }
       .preview-card img { max-height: 320px; }
-      .preview-meta {
-        font-size: 0.86rem;
-        padding: 12px 14px;
-      }
     }
 
     @media (max-width: 420px) {
@@ -912,7 +901,7 @@
       <div class="nav-logo">📸 <span>PHOTO</span>EVAL</div>
       <div class="nav-tabs">
         <a class="tab-link active" href="./photo-evaluator-dl-beta.html">ベータ</a>
-        <a class="tab-link" href="#stats">統計</a>
+        <a class="tab-link" href="#global-stats">統計</a>
       </div>
     </div>
   </nav>
@@ -967,67 +956,87 @@
         </div>
       </div>
 
-      <div class="panel" id="dl-stats">
-        <h2 class="section-title">採点結果</h2>
+    </section>
 
-        <div id="result-empty" class="empty">画像を選んで `写真を評価する` を押すと、ここに採点結果が表示されます。</div>
+    <section class="panel" id="dl-stats">
+      <h2 class="section-title">採点結果</h2>
 
-        <div id="result-card" class="result-card" style="display:none">
-          <div class="result-toolbar">
-            <h3 class="result-section-title">✦ チェック結果</h3>
-            <button id="reset-btn" class="ghost-btn" type="button">別の写真をチェックする</button>
-          </div>
+      <div id="result-empty" class="empty">画像を選んで `写真を評価する` を押すと、ここに採点結果が表示されます。</div>
 
-          <section class="result-hero">
-            <div class="hero-label">
-              <span>TOTAL SCORE</span>
-              <span class="hero-badge" id="result-badge">DL未実行</span>
-            </div>
-            <div class="hero-score-row">
-              <div class="hero-score" id="dl-total-score">-</div>
-              <div class="hero-score-unit">/100</div>
-            </div>
-            <div class="hero-meta" id="hero-meta">通常評価とDL/ML評価の差分がここに表示されます。</div>
-          </section>
-
-          <section class="score-grid" id="score-grid"></section>
-
-          <section class="method-card">
-            <div class="method-header">
-              <div class="method-title">結果の出し方</div>
-              <span class="badge" id="method-badge">DLベータ</span>
-            </div>
-            <div class="method-grid">
-              <div class="method-box">
-                <strong>現在のチェック方式</strong>
-                <span id="method-mode">DL評価</span>
-              </div>
-              <div class="method-box">
-                <strong>調整データの版</strong>
-                <span id="method-version">-</span>
-              </div>
-              <div class="method-box">
-                <strong>標準の総合点</strong>
-                <span id="rule-total-score">-</span>
-              </div>
-              <div class="method-box">
-                <strong>自動調整</strong>
-                <span id="dl-delta-score">-</span>
-              </div>
-              <div class="method-box">
-                <strong>推定カテゴリ</strong>
-                <span id="estimated-genre">-</span>
-              </div>
-            </div>
-          </section>
-
+      <div id="result-card" class="result-card" style="display:none">
+        <div class="result-toolbar">
+          <h3 class="result-section-title">✦ チェック結果</h3>
+          <button id="reset-btn" class="ghost-btn" type="button">別の写真をチェックする</button>
         </div>
+
+        <section class="result-hero">
+          <div class="hero-label">
+            <span>TOTAL SCORE</span>
+            <span class="hero-badge" id="result-badge">DL未実行</span>
+          </div>
+          <div class="hero-score-row">
+            <div class="hero-score" id="dl-total-score">-</div>
+            <div class="hero-score-unit">/100</div>
+          </div>
+          <div class="hero-meta" id="hero-meta">通常評価とDL/ML評価の差分がここに表示されます。</div>
+        </section>
+
+        <section class="score-grid" id="score-grid"></section>
+
+        <section class="method-card">
+          <div class="method-header">
+            <div class="method-title">結果の出し方</div>
+            <span class="badge" id="method-badge">DLベータ</span>
+          </div>
+          <div class="method-grid">
+            <div class="method-box">
+              <strong>現在のチェック方式</strong>
+              <span id="method-mode">DL評価</span>
+            </div>
+            <div class="method-box">
+              <strong>調整データの版</strong>
+              <span id="method-version">-</span>
+            </div>
+            <div class="method-box">
+              <strong>標準の総合点</strong>
+              <span id="rule-total-score">-</span>
+            </div>
+            <div class="method-box">
+              <strong>自動調整</strong>
+              <span id="dl-delta-score">-</span>
+            </div>
+            <div class="method-box">
+              <strong>推定カテゴリ</strong>
+              <span id="estimated-genre">-</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+    <section class="panel stats-panel" id="global-stats">
+      <h2 class="section-title">全ユーザーの統計</h2>
+      <p class="section-sub">公開用に集計された全体傾向を表示します。</p>
+      <div class="stats-grid">
+        <section class="stats-block">
+          <h3>TOTAL SCORE の分布</h3>
+          <div id="global-total-distribution" class="stats-empty">まだ統計データがありません。</div>
+        </section>
+        <section class="stats-block">
+          <h3>採点項目の平均</h3>
+          <div id="global-score-averages" class="stats-empty">まだ統計データがありません。</div>
+        </section>
+        <section class="stats-block">
+          <h3>推定カテゴリごとの件数</h3>
+          <div id="global-genre-counts" class="stats-empty">まだ統計データがありません。</div>
+        </section>
       </div>
     </section>
 
     <section class="panel stats-panel" id="stats">
-      <h2 class="section-title">統計</h2>
-      <p class="section-sub">評価結果は自動で保存され、この統計にすぐ反映されます。</p>
+      <h2 class="section-title">あなたの統計</h2>
+      <p class="section-sub">この端末で評価した結果が自動保存され、ここにすぐ反映されます。</p>
       <div class="stats-grid">
         <section class="stats-block">
           <h3>TOTAL SCORE の分布</h3>
@@ -1049,6 +1058,7 @@
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
     const DL_BETA_STATS_STORAGE_KEY = 'photo_eval_dl_beta_saved_results';
     const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
+    const PUBLIC_STATS_PATH = './photo_eval_public_stats.json';
     const DEFAULT_DL_API_BASE = 'https://photo-evaluator-dl-api.onrender.com';
 
     const fileInput = document.getElementById('file-input');
@@ -1068,6 +1078,9 @@
     const heroMeta = document.getElementById('hero-meta');
     const scoreGrid = document.getElementById('score-grid');
     const resetButton = document.getElementById('reset-btn');
+    const globalTotalDistribution = document.getElementById('global-total-distribution');
+    const globalScoreAverages = document.getElementById('global-score-averages');
+    const globalGenreCounts = document.getElementById('global-genre-counts');
     const statsTotalDistribution = document.getElementById('stats-total-distribution');
     const statsScoreAverages = document.getElementById('stats-score-averages');
     const statsGenreCounts = document.getElementById('stats-genre-counts');
@@ -1798,6 +1811,61 @@
       renderBarList(statsGenreCounts, genreRows, 'genre');
     }
 
+    async function renderGlobalStats() {
+      try {
+        const response = await fetch(PUBLIC_STATS_PATH, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const stats = await response.json();
+
+        const distributionRows = (stats?.scoreHistogram?.buckets || []).map(bucket => ({
+          label: bucket.label,
+          count: Number(bucket.count || 0),
+        }));
+        if (distributionRows.length) {
+          globalTotalDistribution.className = '';
+          renderBarList(globalTotalDistribution, distributionRows, 'histogram');
+        }
+
+        const averageItems = stats?.itemAverages || [];
+        if (averageItems.length) {
+          globalScoreAverages.className = '';
+          globalScoreAverages.innerHTML = `
+            <div class="average-grid">
+              ${averageItems.map(item => `
+                <div class="average-card">
+                  <strong>${GENRE_LABELS[item.label] || ({
+                    composition: '構図',
+                    light: '光',
+                    color: '色',
+                    technical: '技術',
+                    subject: '主題性',
+                    impact: '印象',
+                  }[item.label] || item.label)}</strong>
+                  <span>${round(Number(item.value || 0), 1)}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        const genreRows = (stats?.genreCounts || []).map(item => ({
+          label: GENRE_LABELS[item.label] || item.label,
+          count: Number(item.count || 0),
+        }));
+        if (genreRows.length) {
+          globalGenreCounts.className = '';
+          renderBarList(globalGenreCounts, genreRows, 'genre');
+        }
+      } catch (error) {
+        globalTotalDistribution.textContent = '全ユーザー統計の読み込みに失敗しました。';
+        globalTotalDistribution.className = 'stats-empty';
+        globalScoreAverages.textContent = '全ユーザー統計の読み込みに失敗しました。';
+        globalScoreAverages.className = 'stats-empty';
+        globalGenreCounts.textContent = '全ユーザー統計の読み込みに失敗しました。';
+        globalGenreCounts.className = 'stats-empty';
+      }
+    }
+
     async function requestDlPrediction(imageDataUrl, ruleScore) {
       return withTimeout(
         apiRequest('/api/dl/predict', {
@@ -1830,11 +1898,9 @@
       clearPreviewObjectUrl();
       currentPreviewObjectUrl = previewSrc || URL.createObjectURL(file);
       previewImage.src = currentPreviewObjectUrl;
-      previewName.textContent = file.name;
-      previewSize.textContent = formatBytes(file.size);
       previewWrap.style.display = 'grid';
       evalButton.disabled = false;
-      setStatus('画像を読み込みました。DL版で評価できます。', 'success');
+      setStatus('画像を読み込みました。評価できます。', 'success');
     }
 
     function getScoreTone(value) {
@@ -1953,7 +2019,7 @@
         if (dl.engine === 'ml') {
           setStatus(dl.usedModel ? 'DLが使えなかったため、ML補正で表示しました。' : 'DLとMLが使えなかったため、標準評価で表示しました。', dl.usedModel ? 'success' : '');
         } else {
-          setStatus(dl.usedModel ? 'DL版の採点が完了しました。' : 'DLモデルを使わず表示しました。', dl.usedModel ? 'success' : '');
+          setStatus(dl.usedModel ? '採点が完了しました。' : 'DLモデルを使わず表示しました。', dl.usedModel ? 'success' : '');
         }
       } catch (error) {
         console.error(error);
@@ -1990,8 +2056,6 @@
       fileInput.value = '';
       clearPreviewObjectUrl();
       previewImage.removeAttribute('src');
-      previewName.textContent = '未選択';
-      previewSize.textContent = '-';
       previewWrap.style.display = 'none';
       evalButton.disabled = true;
       resultCard.style.display = 'none';
@@ -2000,6 +2064,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    void renderGlobalStats();
     renderStats();
     void refreshApiStatus();
   </script>
