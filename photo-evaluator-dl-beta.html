@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>写真チェックアプリ | Photo Eval DL Beta</title>
+  <title>写真チェックアプリベータ | Photo Eval Beta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -449,6 +449,8 @@
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.96);
       color: var(--text-muted);
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
     }
 
     .badge.green { color: var(--green); }
@@ -481,6 +483,8 @@
       font-size: 0.95rem;
       font-weight: 800;
       color: var(--text-muted);
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
     }
 
     .score-tile-value {
@@ -488,6 +492,8 @@
       font-weight: 900;
       color: #ee9b14;
       letter-spacing: -0.04em;
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
     }
 
     .score-bar-track {
@@ -553,14 +559,25 @@
       color: var(--text-dim);
       font-size: 0.8rem;
       margin-bottom: 8px;
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
     }
 
     .method-box span {
       color: var(--text);
       font-size: 1.15rem;
       font-weight: 800;
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #method-version {
+      white-space: normal;
       overflow-wrap: anywhere;
       word-break: break-word;
+      line-height: 1.45;
     }
 
     .note {
@@ -772,32 +789,31 @@
     <div class="nav-inner">
       <div class="nav-logo">📸 <span>PHOTO</span>EVAL</div>
       <div class="nav-tabs">
-        <a class="tab-link active" href="./photo-evaluator-dl-beta.html">DLベータ</a>
+        <a class="tab-link active" href="./photo-evaluator-dl-beta.html">ベータ</a>
         <a class="tab-link" href="#dl-stats">統計</a>
       </div>
     </div>
   </nav>
 
   <main class="page">
-    <h1 class="page-title">写真チェックアプリ DLベータ</h1>
-    <p class="page-sub">通常の公開版とは完全に別で使う、DL 評価専用ページです。保存・Webhook・履歴・学習保存には混ぜず、DL 推論 API を使って総合点と項目別スコア、コメントを確認します。</p>
+    <h1 class="page-title">写真チェックアプリベータ</h1>
 
     <section class="welcome-panel">
       <div class="step-grid">
         <article class="step-card">
           <span class="step-num">1</span>
           <h3>画像を選ぶ</h3>
-          <p>スマホやパソコンにある写真を1枚選ぶだけです。ここではDL評価専用の比較を行います。</p>
+          <p>スマホやパソコンにある写真を1枚選ぶだけです。</p>
         </article>
         <article class="step-card">
           <span class="step-num">2</span>
-          <h3>DLで評価する</h3>
-          <p>Render上のDL APIを使って、総合点と項目別スコアを取得します。必要ならMLへ自動フォールバックします。</p>
+          <h3>評価する</h3>
+          <p>総合点と項目別スコアを取得します。</p>
         </article>
         <article class="step-card">
           <span class="step-num">3</span>
           <h3>結果を見る</h3>
-          <p>通常評価とDL/ML評価を並べて確認できます。公開版の保存や履歴には混ざりません。</p>
+          <p>結果を確認できます。</p>
         </article>
       </div>
     </section>
@@ -805,11 +821,11 @@
     <section class="layout">
       <div class="panel">
         <h2 class="section-title">画像選択</h2>
-        <p class="section-sub">DL 評価に使う画像を1枚選びます。結果は通常公開版や学習データへ混ざりません。</p>
+        <p class="section-sub">評価に使う画像を1枚選びます。</p>
 
         <div class="dropzone">
-          <strong>DL版で評価する画像を選ぶ</strong>
-          <p>JPG / JPEG / PNG / WebP / HEIF を読み込みます。ここでの結果は通常公開版や学習データへ混ざりません。</p>
+          <strong>評価する画像を選ぶ</strong>
+          <p>JPG / JPEG / PNG / WebP / HEIF を読み込みます。</p>
           <div class="file-picker">
             <span class="file-label" aria-hidden="true">画像を選択する</span>
             <input id="file-input" class="file-input" type="file" accept="image/*,.heic,.heif">
@@ -819,12 +835,12 @@
         <div class="preview-wrap" id="preview-wrap">
           <div class="preview-card">
             <img id="preview-image" alt="DL評価用プレビュー">
-            <div class="preview-meta">
+            <div class="preview-meta" hidden>
               <span id="preview-name">未選択</span>
               <span id="preview-size">-</span>
             </div>
           </div>
-          <button id="eval-btn" class="btn btn-primary" type="button" disabled>DL版で評価する</button>
+          <button id="eval-btn" class="btn btn-primary" type="button" disabled>写真を評価する</button>
           <div class="status-line" id="status-line"></div>
         </div>
       </div>
@@ -832,7 +848,7 @@
       <div class="panel" id="dl-stats">
         <h2 class="section-title">採点結果</h2>
 
-        <div id="result-empty" class="empty">画像を選んで `DL版で評価する` を押すと、ここに通常評価と DL 評価の比較が表示されます。</div>
+        <div id="result-empty" class="empty">画像を選んで `写真を評価する` を押すと、ここに採点結果が表示されます。</div>
 
         <div id="result-card" class="result-card" style="display:none">
           <div class="result-toolbar">
