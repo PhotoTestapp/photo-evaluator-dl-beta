@@ -1058,7 +1058,6 @@
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
     const DL_BETA_STATS_STORAGE_KEY = 'photo_eval_dl_beta_only_saved_results_v1';
     const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
-    const PUBLIC_STATS_PATH = './photo_eval_public_stats.json';
     const DEFAULT_DL_API_BASE = 'https://photo-evaluator-dl-api.onrender.com';
 
     const fileInput = document.getElementById('file-input');
@@ -1757,6 +1756,20 @@
       `;
     }
 
+    function renderAverageCards(container, averageItems) {
+      container.className = '';
+      container.innerHTML = `
+        <div class="average-grid">
+          ${averageItems.map(item => `
+            <div class="average-card">
+              <strong>${item.label}</strong>
+              <span>${round(Number(item.value || 0), 1)}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
     function renderStats(records = loadSavedStats()) {
       if (!records.length) {
         statsTotalDistribution.textContent = 'まだ統計データがありません。';
@@ -1811,51 +1824,59 @@
       renderBarList(statsGenreCounts, genreRows, 'genre');
     }
 
+    function normalizeAverageLabel(label) {
+      return ({
+        composition: '構図',
+        light: '光',
+        color: '色',
+        technical: '技術',
+        subject: '主題性',
+        impact: '印象',
+        total: 'TOTAL',
+      }[label] || label);
+    }
+
+    function renderGlobalStatsFromPayload(stats) {
+      const distributionRows = (stats?.scoreHistogram?.buckets || []).map(bucket => ({
+        label: bucket.label,
+        count: Number(bucket.count || 0),
+      }));
+      if (distributionRows.length) {
+        globalTotalDistribution.className = '';
+        renderBarList(globalTotalDistribution, distributionRows, 'histogram');
+      } else {
+        globalTotalDistribution.textContent = 'まだ統計データがありません。';
+        globalTotalDistribution.className = 'stats-empty';
+      }
+
+      const averageItems = (stats?.itemAverages || []).map(item => ({
+        label: normalizeAverageLabel(item.label),
+        value: Number(item.value || 0),
+      }));
+      if (averageItems.length) {
+        renderAverageCards(globalScoreAverages, averageItems);
+      } else {
+        globalScoreAverages.textContent = 'まだ統計データがありません。';
+        globalScoreAverages.className = 'stats-empty';
+      }
+
+      const genreRows = (stats?.genreCounts || []).map(item => ({
+        label: GENRE_LABELS[item.label] || item.label,
+        count: Number(item.count || 0),
+      }));
+      if (genreRows.length) {
+        globalGenreCounts.className = '';
+        renderBarList(globalGenreCounts, genreRows, 'genre');
+      } else {
+        globalGenreCounts.textContent = 'まだ統計データがありません。';
+        globalGenreCounts.className = 'stats-empty';
+      }
+    }
+
     async function renderGlobalStats() {
       try {
-        const response = await fetch(PUBLIC_STATS_PATH, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const stats = await response.json();
-
-        const distributionRows = (stats?.scoreHistogram?.buckets || []).map(bucket => ({
-          label: bucket.label,
-          count: Number(bucket.count || 0),
-        }));
-        if (distributionRows.length) {
-          globalTotalDistribution.className = '';
-          renderBarList(globalTotalDistribution, distributionRows, 'histogram');
-        }
-
-        const averageItems = stats?.itemAverages || [];
-        if (averageItems.length) {
-          globalScoreAverages.className = '';
-          globalScoreAverages.innerHTML = `
-            <div class="average-grid">
-              ${averageItems.map(item => `
-                <div class="average-card">
-                  <strong>${GENRE_LABELS[item.label] || ({
-                    composition: '構図',
-                    light: '光',
-                    color: '色',
-                    technical: '技術',
-                    subject: '主題性',
-                    impact: '印象',
-                  }[item.label] || item.label)}</strong>
-                  <span>${round(Number(item.value || 0), 1)}</span>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-
-        const genreRows = (stats?.genreCounts || []).map(item => ({
-          label: GENRE_LABELS[item.label] || item.label,
-          count: Number(item.count || 0),
-        }));
-        if (genreRows.length) {
-          globalGenreCounts.className = '';
-          renderBarList(globalGenreCounts, genreRows, 'genre');
-        }
+        const response = await apiRequest('/api/dl/public-stats');
+        renderGlobalStatsFromPayload(response.stats || {});
       } catch (error) {
         globalTotalDistribution.textContent = '全ユーザー統計の読み込みに失敗しました。';
         globalTotalDistribution.className = 'stats-empty';
@@ -1863,6 +1884,20 @@
         globalScoreAverages.className = 'stats-empty';
         globalGenreCounts.textContent = '全ユーザー統計の読み込みに失敗しました。';
         globalGenreCounts.className = 'stats-empty';
+      }
+    }
+
+    async function saveGlobalEvaluation(record) {
+      try {
+        const response = await apiRequest('/api/dl/evaluation', {
+          method: 'POST',
+          body: record,
+        });
+        if (response?.stats) {
+          renderGlobalStatsFromPayload(response.stats);
+        }
+      } catch (error) {
+        console.warn('Failed to save DL beta evaluation', error);
       }
     }
 
@@ -1971,7 +2006,7 @@
         dl.validationMae == null ? '' : `検証MAE ${round(Number(dl.validationMae), 3)}`,
       ].filter(Boolean).join(' / ');
       renderScoreGrid(dlScores);
-      saveStatsRecord({
+      const savedRecord = {
         savedAt: new Date().toISOString(),
         engine: dl.engine || 'rule',
         totalScore: Number(dlScores.totalScore || 0),
@@ -1982,8 +2017,11 @@
         subjectScore: Number(dlScores.subjectScore || 0),
         impressionScore: Number(dlScores.impressionScore || 0),
         genre: estimatedGenreCode,
-      });
+        modelVersion: dl.modelVersion || dl.modelType || '',
+      };
+      saveStatsRecord(savedRecord);
       renderStats();
+      void saveGlobalEvaluation(savedRecord);
     }
 
     async function runDlTest() {
