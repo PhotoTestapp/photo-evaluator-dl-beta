@@ -1,0 +1,126 @@
+{
+  "generatedAt": "2026-03-21T15:33:36.039738+00:00",
+  "modelVersion": "linear-v2-20260322003334",
+  "sampleCount": 265,
+  "summary": {
+    "totalRecords": 265,
+    "averageTotalScore": 65.21
+  },
+  "scoreHistogram": {
+    "maxCount": 153,
+    "buckets": [
+      {
+        "label": "0-9",
+        "min": 0,
+        "max": 9,
+        "count": 0
+      },
+      {
+        "label": "10-19",
+        "min": 10,
+        "max": 19,
+        "count": 0
+      },
+      {
+        "label": "20-29",
+        "min": 20,
+        "max": 29,
+        "count": 0
+      },
+      {
+        "label": "30-39",
+        "min": 30,
+        "max": 39,
+        "count": 2
+      },
+      {
+        "label": "40-49",
+        "min": 40,
+        "max": 49,
+        "count": 10
+      },
+      {
+        "label": "50-59",
+        "min": 50,
+        "max": 59,
+        "count": 31
+      },
+      {
+        "label": "60-69",
+        "min": 60,
+        "max": 69,
+        "count": 153
+      },
+      {
+        "label": "70-79",
+        "min": 70,
+        "max": 79,
+        "count": 69
+      },
+      {
+        "label": "80-89",
+        "min": 80,
+        "max": 89,
+        "count": 0
+      },
+      {
+        "label": "90-99",
+        "min": 90,
+        "max": 99,
+        "count": 0
+      }
+    ]
+  },
+  "genreCounts": [
+    {
+      "label": "portrait",
+      "count": 35
+    },
+    {
+      "label": "landscape",
+      "count": 55
+    },
+    {
+      "label": "animal",
+      "count": 33
+    },
+    {
+      "label": "flora",
+      "count": 37
+    },
+    {
+      "label": "food",
+      "count": 92
+    },
+    {
+      "label": "other",
+      "count": 46
+    }
+  ],
+  "itemAverages": [
+    {
+      "label": "composition",
+      "value": 63.85
+    },
+    {
+      "label": "light",
+      "value": 75.25
+    },
+    {
+      "label": "color",
+      "value": 70.14
+    },
+    {
+      "label": "technical",
+      "value": 70.3
+    },
+    {
+      "label": "subject",
+      "value": 61.11
+    },
+    {
+      "label": "impact",
+      "value": 68.16
+    }
+  ]
+}
