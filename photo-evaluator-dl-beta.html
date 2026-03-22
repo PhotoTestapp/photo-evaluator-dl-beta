@@ -1405,7 +1405,7 @@
         throw new Error(data?.message ? `保存先エラー: ${data.message}` : `保存先エラー: HTTP ${response.status}`);
       }
       if (!data?.success || !data?.savedToDrive) {
-        throw new Error(data?.driveError || data?.message || 'Google Drive への保存に失敗しました');
+        throw new Error(data?.driveError || data?.message || '保存に失敗しました');
       }
       return data;
     }
@@ -2211,11 +2211,11 @@
         }
         void saveEvaluationToDrive(currentFile, imageSource, analysis, dl, rendered.dlScores, rendered.estimatedGenreCode)
           .then(() => {
-            setStatus('採点が完了しました。Google Driveへ保存しました。', 'success');
+            setStatus('採点が完了しました。', 'success');
           })
           .catch(error => {
             console.error(error);
-            setStatus(`採点は完了しましたが、Google Drive への保存に失敗しました: ${error.message || error}`, 'error');
+            setStatus(`採点は完了しましたが、保存に失敗しました: ${error.message || error}`, 'error');
           });
       } catch (error) {
         console.error(error);
