@@ -3,106 +3,193 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Photo Evaluator DL Beta</title>
+  <title>写真チェックアプリ | Photo Eval DL Beta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #eef5ff;
-      --panel: rgba(255, 255, 255, 0.94);
-      --line: #cddcff;
-      --text: #243b6b;
-      --muted: #5b73a6;
+      --surface: rgba(255, 255, 255, 0.96);
+      --surface2: #f7faff;
+      --border: #d8e4fb;
+      --text: #233c72;
+      --text-muted: #6a82b5;
+      --text-dim: #9aabcf;
+      --accent: #5d8df7;
+      --accent-dim: rgba(93,141,247,0.12);
+      --accent-border: rgba(93,141,247,0.28);
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
       --blue: #5d8df7;
-      --green: #26b68b;
-      --amber: #f0a51a;
-      --red: #ef6b82;
-      --navy: #1d2d5a;
+      --radius: 12px;
+      --radius-lg: 20px;
       --shadow: 0 20px 50px rgba(68, 101, 173, 0.12);
-      --radius: 28px;
     }
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+      font-family: 'Noto Sans JP', sans-serif;
       background:
         radial-gradient(circle at top left, rgba(93, 141, 247, 0.12), transparent 28%),
         linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
       color: var(--text);
     }
 
-    .page {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 18px 42px;
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.86);
+      border-bottom: 1px solid rgba(216,228,251,0.9);
+      backdrop-filter: blur(12px);
+      padding: 0 20px;
     }
 
-    .hero,
+    .nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo span { color: #8ea2c8; font-weight: 400; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tab-link {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s, color 0.15s;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+    }
+
+    .tab-link:hover { background: rgba(93,141,247,0.08); color: var(--text); }
+    .tab-link.active { background: linear-gradient(135deg, #6f9cff, #5d8df7); color: #fff; font-weight: 700; }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .page-title {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .page-sub {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .welcome-panel,
     .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow);
     }
 
-    .hero {
-      padding: 30px 34px;
-      margin-bottom: 22px;
+    .welcome-panel {
+      padding: 20px;
+      margin-bottom: 24px;
     }
 
-    .eyebrow {
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .step-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+    }
+
+    .step-num {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 16px;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      color: var(--blue);
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-bottom: 18px;
-      background: rgba(255, 255, 255, 0.9);
+      background: linear-gradient(135deg, #6f9cff, #5d8df7);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.78rem;
+      margin-bottom: 10px;
     }
 
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2.3rem, 5vw, 4rem);
-      line-height: 0.96;
-      letter-spacing: -0.05em;
-      color: var(--navy);
+    .step-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
     }
 
-    .hero p {
+    .step-card p {
       margin: 0;
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.8;
-      max-width: 920px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.7;
     }
 
     .chip-row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 18px;
+      margin-bottom: 22px;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
+      padding: 8px 14px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
-      color: var(--muted);
-      font-size: 0.92rem;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.88);
+      color: var(--text-muted);
+      font-size: 0.82rem;
       font-weight: 700;
       text-decoration: none;
     }
 
     .chip.green { color: var(--green); }
-    .chip.amber { color: #bf7b00; }
+    .chip.amber { color: var(--amber); }
     .chip.red { color: var(--red); }
 
     .layout {
@@ -121,12 +208,12 @@
       font-size: 1.95rem;
       line-height: 1.05;
       letter-spacing: -0.04em;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .section-sub {
       margin: 0 0 18px;
-      color: var(--muted);
+      color: var(--text-muted);
       line-height: 1.75;
       font-size: 0.98rem;
     }
@@ -138,25 +225,25 @@
     }
 
     .field-label {
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.88rem;
       font-weight: 800;
     }
 
     .field-input {
       width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.96);
       padding: 14px 16px;
-      color: var(--navy);
+      color: var(--text);
       font-size: 0.98rem;
       font-weight: 700;
     }
 
     .field-note {
       margin: 0;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.88rem;
       line-height: 1.7;
     }
@@ -166,20 +253,20 @@
       gap: 12px;
       justify-items: center;
       text-align: center;
-      border: 1px dashed var(--line);
-      border-radius: 24px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
       padding: 28px 20px;
-      background: rgba(247, 251, 255, 0.95);
+      background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 100%);
     }
 
     .dropzone strong {
       font-size: 1.15rem;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .dropzone p {
       margin: 0;
-      color: var(--muted);
+      color: var(--text-muted);
       line-height: 1.7;
     }
 
@@ -203,7 +290,7 @@
     .file-label:hover { transform: translateY(-1px); }
 
     .file-label {
-      background: linear-gradient(135deg, #6c9fff, #5c86ff);
+      background: linear-gradient(135deg, #7d95ff, #5c86ff);
       color: #fff;
       min-width: 240px;
     }
@@ -230,10 +317,10 @@
     }
 
     .preview-card {
-      border: 1px solid var(--line);
-      border-radius: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
       overflow: hidden;
-      background: rgba(249, 252, 255, 0.9);
+      background: rgba(249, 252, 255, 0.95);
     }
 
     .preview-card img {
@@ -246,7 +333,7 @@
 
     .preview-meta {
       padding: 14px 16px;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.92rem;
       display: flex;
       justify-content: space-between;
@@ -255,9 +342,9 @@
     }
 
     .result-card {
-      background: linear-gradient(180deg, rgba(252, 253, 255, 0.96), rgba(246, 250, 255, 0.96));
-      border: 1px solid var(--line);
-      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(252,253,255,0.98), rgba(245,249,255,0.98));
+      border: 1px solid var(--border);
+      border-radius: 18px;
       padding: 24px;
     }
 
@@ -272,7 +359,7 @@
     .result-head h2 {
       margin: 0;
       font-size: 1.45rem;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .badge {
@@ -283,9 +370,9 @@
       border-radius: 999px;
       font-size: 0.88rem;
       font-weight: 800;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--muted);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.96);
+      color: var(--text-muted);
     }
 
     .badge.green { color: var(--green); }
@@ -300,15 +387,15 @@
     }
 
     .score-box {
-      border: 1px solid var(--line);
-      border-radius: 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 18px;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255,255,255,0.96);
     }
 
     .score-label {
       display: block;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.86rem;
       margin-bottom: 8px;
       font-weight: 700;
@@ -319,7 +406,7 @@
       font-weight: 900;
       line-height: 1;
       letter-spacing: -0.05em;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .score-value.blue { color: var(--blue); }
@@ -332,15 +419,15 @@
     }
 
     .compare-item {
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.86);
+      background: rgba(255,255,255,0.96);
     }
 
     .compare-item strong {
       display: block;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.84rem;
       margin-bottom: 6px;
     }
@@ -349,7 +436,7 @@
       font-size: 1.45rem;
       font-weight: 900;
       letter-spacing: -0.04em;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .matrix-note,
@@ -373,10 +460,10 @@
     }
 
     .compare-matrix-cell {
-      border: 1px solid var(--line);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 12px 14px;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255,255,255,0.96);
       min-height: 64px;
       display: flex;
       flex-direction: column;
@@ -386,12 +473,12 @@
     .compare-matrix-head .compare-matrix-cell {
       background: rgba(238, 245, 255, 0.95);
       font-weight: 800;
-      color: var(--muted);
+      color: var(--text-muted);
     }
 
     .compare-matrix-label {
       font-size: 0.84rem;
-      color: var(--muted);
+      color: var(--text-muted);
       margin-bottom: 4px;
       font-weight: 700;
     }
@@ -400,7 +487,7 @@
       font-size: 1.35rem;
       font-weight: 900;
       letter-spacing: -0.04em;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .comment-grid {
@@ -411,21 +498,21 @@
     }
 
     .comment-card {
-      border: 1px solid var(--line);
-      border-radius: 20px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 18px;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255,255,255,0.96);
     }
 
     .comment-card h3 {
       margin: 0 0 12px;
       font-size: 1.06rem;
-      color: var(--navy);
+      color: var(--text);
     }
 
     .comment-card p {
       margin: 0 0 12px;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.92rem;
       line-height: 1.8;
     }
@@ -434,7 +521,7 @@
 
     .comment-card strong {
       display: block;
-      color: var(--navy);
+      color: var(--text);
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
@@ -442,7 +529,7 @@
     .status-line {
       min-height: 1.5em;
       margin-top: 12px;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 0.95rem;
       font-weight: 700;
     }
@@ -451,21 +538,23 @@
     .status-line.success { color: var(--green); }
 
     .empty {
-      border: 1px dashed var(--line);
-      border-radius: 22px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
       padding: 28px 18px;
       text-align: center;
-      color: var(--muted);
-      background: rgba(247, 250, 255, 0.75);
+      color: var(--text-muted);
+      background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 100%);
     }
 
     @media (max-width: 980px) {
       .layout { grid-template-columns: 1fr; }
+      .step-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
-      .page { padding: 18px 14px 32px; }
-      .hero, .panel { padding: 20px; border-radius: 24px; }
+      .page { padding: 24px 16px 72px; }
+      nav { padding: 0 16px; }
+      .panel, .welcome-panel { padding: 20px; border-radius: var(--radius-lg); }
       .score-panels, .compare-grid, .comment-grid { grid-template-columns: 1fr; }
       .compare-matrix-row { grid-template-columns: 1fr; }
       .preview-card img { max-height: 320px; }
@@ -473,17 +562,45 @@
   </style>
 </head>
 <body>
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">📸 <span>PHOTO</span>EVAL</div>
+      <div class="nav-tabs">
+        <a class="tab-link" href="./index.html">写真をみる</a>
+        <a class="tab-link active" href="./photo-evaluator-dl-beta.html">DLベータ</a>
+      </div>
+    </div>
+  </nav>
+
   <main class="page">
-    <section class="hero">
-      <div class="eyebrow">GitHub Pages 用 DL ベータ</div>
-      <h1>Photo Evaluator DL Beta</h1>
-      <p>現在の公開版とは完全に別で使う、DL 評価専用ページです。保存・Webhook・履歴・学習保存には混ぜず、DL 推論 API を使って総合点と項目別スコア、コメントを確認します。</p>
-      <div class="chip-row">
-        <span class="chip" id="chip-api-status">DL API接続先を確認してください</span>
-        <span class="chip amber">通常の公開版とは完全に分離</span>
-        <a class="chip" href="./index.html">現在の公開版へ戻る</a>
+    <h1 class="page-title">写真チェックアプリ DLベータ</h1>
+    <p class="page-sub">通常の公開版とは完全に別で使う、DL 評価専用ページです。保存・Webhook・履歴・学習保存には混ぜず、DL 推論 API を使って総合点と項目別スコア、コメントを確認します。</p>
+
+    <section class="welcome-panel">
+      <div class="step-grid">
+        <article class="step-card">
+          <span class="step-num">1</span>
+          <h3>画像を選ぶ</h3>
+          <p>スマホやパソコンにある写真を1枚選ぶだけです。ここではDL評価専用の比較を行います。</p>
+        </article>
+        <article class="step-card">
+          <span class="step-num">2</span>
+          <h3>DLで評価する</h3>
+          <p>Render上のDL APIを使って、総合点と項目別スコアを取得します。必要ならMLへ自動フォールバックします。</p>
+        </article>
+        <article class="step-card">
+          <span class="step-num">3</span>
+          <h3>結果を見る</h3>
+          <p>通常評価とDL/ML評価を並べて確認できます。公開版の保存や履歴には混ざりません。</p>
+        </article>
       </div>
     </section>
+
+    <div class="chip-row">
+      <span class="chip" id="chip-api-status">DL API接続先を確認してください</span>
+      <span class="chip amber">通常の公開版とは完全に分離</span>
+      <a class="chip" href="./index.html">現在の公開版へ戻る</a>
+    </div>
 
     <section class="layout">
       <div class="panel">
@@ -570,6 +687,7 @@
 
   <script>
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
+    const BROWSER_ML_MODEL_PATH = './photo_eval_model.json';
     const DEFAULT_DL_API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
       ? `${location.protocol}//${location.host}`
       : '';
@@ -588,6 +706,7 @@
     const compareMatrix = document.getElementById('compare-matrix');
     const commentGrid = document.getElementById('comment-grid');
     const dlApiBaseInput = document.getElementById('dl-api-base');
+    let browserMlModelPromise = null;
 
     const SCORE_ITEMS = [
       { label: '構図', key: 'compositionScore' },
@@ -657,6 +776,106 @@
       const range = hardLimit - tolerance;
       return 80 - ((delta - tolerance) / Math.max(1e-9, range)) * 60;
     };
+
+    async function loadBrowserMlModel() {
+      if (!browserMlModelPromise) {
+        browserMlModelPromise = fetch(BROWSER_ML_MODEL_PATH, { cache: 'no-store' })
+          .then(async response => {
+            if (!response.ok) throw new Error(`MLモデル取得エラー: HTTP ${response.status}`);
+            const model = await response.json();
+            if (!Array.isArray(model?.feature_names) || !Array.isArray(model?.weights)) {
+              throw new Error('MLモデル形式が不正です');
+            }
+            return model;
+          })
+          .catch(error => {
+            browserMlModelPromise = null;
+            throw error;
+          });
+      }
+      return browserMlModelPromise;
+    }
+
+    function buildMlStatusFromModel(model) {
+      const sampleCount = Number(model?.sample_count || 0);
+      const minimumMlSamples = Number(model?.minimum_ml_samples || 30);
+      const available = sampleCount >= minimumMlSamples;
+      return {
+        available,
+        sampleCount,
+        minimumMlSamples,
+        modelVersion: model?.model_version || '',
+        reason: available ? '' : `学習データ数が${minimumMlSamples}件に達していないためML補正は未使用です`,
+      };
+    }
+
+    function normalizeFeatureVectorForModel(featureVector, predictedScores, featureNames) {
+      const merged = {
+        ...featureVector,
+        ...predictedScores,
+        ruleTotalScore: predictedScores?.totalScore ?? 0,
+        impactScore: predictedScores?.impactScore ?? predictedScores?.impressionScore ?? featureVector?.impactScore ?? 0,
+      };
+      const normalized = {};
+      for (const name of featureNames) {
+        normalized[name] = Number(merged[name] ?? 0) || 0;
+      }
+      return normalized;
+    }
+
+    async function predictWithBrowserModel(featureVector, ruleBasedScores) {
+      const model = await loadBrowserMlModel();
+      const status = buildMlStatusFromModel(model);
+      const ruleScore = Number(ruleBasedScores?.totalScore || 0);
+
+      if (!status.available) {
+        return {
+          mode: 'ML-fallback',
+          engine: 'ml',
+          usedModel: false,
+          predictedTotalScore: ruleScore,
+          predictedDelta: 0,
+          residualApplied: 0,
+          sampleCount: status.sampleCount,
+          minimumMlSamples: status.minimumMlSamples,
+          modelType: model?.model_type || 'linear_residual_regression_v2',
+          modelVersion: status.modelVersion,
+          fallbackReason: status.reason,
+        };
+      }
+
+      const featureNames = Array.isArray(model.feature_names) ? model.feature_names : [];
+      const means = Array.isArray(model.means) ? model.means : [];
+      const scales = Array.isArray(model.scales) ? model.scales : [];
+      const weights = Array.isArray(model.weights) ? model.weights : [];
+      const bias = Number(model.bias || 0);
+      const normalizedFeatures = normalizeFeatureVectorForModel(featureVector, ruleBasedScores, featureNames);
+
+      let residual = bias;
+      for (let index = 0; index < featureNames.length; index += 1) {
+        const name = featureNames[index];
+        const scale = Number(scales[index] || 1) || 1;
+        const mean = Number(means[index] || 0);
+        const value = Number(normalizedFeatures[name] || 0);
+        residual += Number(weights[index] || 0) * ((value - mean) / scale);
+      }
+
+      residual = clamp(residual, -25, 25);
+      const predictedTotalScore = clamp(ruleScore + residual, 0, 100);
+      return {
+        mode: 'ML-fallback',
+        engine: 'ml',
+        usedModel: true,
+        predictedTotalScore: round(predictedTotalScore, 2),
+        predictedDelta: round(residual, 2),
+        residualApplied: round(residual, 2),
+        sampleCount: Number(model.sample_count || 0),
+        minimumMlSamples: Number(model.minimum_ml_samples || 30),
+        modelType: model.model_type || 'linear_residual_regression_v2',
+        modelVersion: model.model_version || '',
+        fallbackReason: '',
+      };
+    }
 
     function getStoredDlApiBase() {
       return localStorage.getItem(DL_API_STORAGE_KEY) || DEFAULT_DL_API_BASE;
@@ -1149,7 +1368,7 @@
       setStatus('画像を読み込みました。DL版で評価できます。', 'success');
     }
 
-    function renderCompareMatrix(ruleScores, dlScores) {
+    function renderCompareMatrix(ruleScores, dlScores, comparisonLabel = 'DL') {
       const rows = [
         ...SCORE_ITEMS.map(item => ({
           label: item.label,
@@ -1164,10 +1383,10 @@
       ];
 
       compareMatrix.innerHTML = `
-        <div class="compare-matrix-row compare-matrix-head">
+          <div class="compare-matrix-row compare-matrix-head">
           <div class="compare-matrix-cell">項目</div>
           <div class="compare-matrix-cell">通常</div>
-          <div class="compare-matrix-cell">DL</div>
+          <div class="compare-matrix-cell">${comparisonLabel}</div>
         </div>
         ${rows.map(row => `
           <div class="compare-matrix-row">
@@ -1182,10 +1401,10 @@
       `;
     }
 
-    function renderCommentGrid(normalComments, dlComments) {
+    function renderCommentGrid(normalComments, compareComments, compareLabel = 'DLコメント') {
       const cards = [
         { label: '通常コメント', comments: normalComments },
-        { label: 'DLコメント', comments: dlComments },
+        { label: compareLabel, comments: compareComments },
       ];
 
       commentGrid.innerHTML = cards.map(card => `
@@ -1200,6 +1419,8 @@
 
     function renderResult(analysis, dl) {
       const ruleScore = Number(analysis.scores.totalScore || 0);
+      const compareLabel = dl.engine === 'ml' ? 'ML' : 'DL';
+      const compareCommentLabel = dl.engine === 'ml' ? 'MLコメント' : 'DLコメント';
       const predictedScores = {};
       Object.entries(DL_SCORE_KEY_MAP).forEach(([sourceKey, scoreKey]) => {
         const value = dl?.predictedScores?.[sourceKey];
@@ -1225,13 +1446,21 @@
       document.getElementById('dl-validation-mae').textContent = dl.validationMae == null ? '—' : String(round(Number(dl.validationMae), 3));
       document.getElementById('dl-model-type').textContent = dl.modelType || '未設定';
 
-      resultBadge.textContent = dl.usedModel ? 'DL推論あり' : 'DL未使用';
-      resultBadge.className = `badge ${dl.usedModel ? 'green' : 'amber'}`;
-      renderCompareMatrix(analysis.scores, dlScores);
-      renderCommentGrid(normalComments, dlComments);
+      if (dl.engine === 'ml') {
+        resultBadge.textContent = dl.usedModel ? 'MLフォールバック' : '標準評価';
+        resultBadge.className = `badge ${dl.usedModel ? 'amber' : 'red'}`;
+      } else {
+        resultBadge.textContent = dl.usedModel ? 'DL推論あり' : 'DL未使用';
+        resultBadge.className = `badge ${dl.usedModel ? 'green' : 'amber'}`;
+      }
+      document.querySelector('.score-box .score-label + .score-value.blue')?.parentElement?.querySelector('.score-label').textContent = `${compareLabel}版の総合点`;
+      renderCompareMatrix(analysis.scores, dlScores, compareLabel);
+      renderCommentGrid(normalComments, dlComments, compareCommentLabel);
       document.getElementById('result-note').textContent = [
         'このページは DL 評価専用です。保存・履歴・フィードバック送信には混ざりません。',
-        dl.usedModel ? '' : `DL: ${dl.reason || '未使用'}`,
+        dl.engine === 'ml'
+          ? `DLが使えなかったため ${dl.usedModel ? 'ML補正' : '標準評価'} を表示しています。${dl.fallbackReason || ''}`.trim()
+          : (dl.usedModel ? '' : `DL: ${dl.reason || '未使用'}`),
       ].filter(Boolean).join(' ');
     }
 
@@ -1249,9 +1478,24 @@
         const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageDataUrl);
         const analysis = await analyzeImageFile(currentFile, imageDataUrl);
         const ruleScore = Math.round(Number(analysis.scores.totalScore || 0));
-        const dl = await requestDlPrediction(dlSafeImageDataUrl, ruleScore);
+        let dl;
+        try {
+          dl = await requestDlPrediction(dlSafeImageDataUrl, ruleScore);
+          dl.engine = 'dl';
+        } catch (dlError) {
+          console.warn('DL prediction failed, falling back to ML', dlError);
+          const mlPrediction = await predictWithBrowserModel(analysis.metrics, analysis.scores);
+          dl = {
+            ...mlPrediction,
+            reason: dlError?.message || 'DL推論が利用できません',
+          };
+        }
         renderResult(analysis, dl);
-        setStatus(dl.usedModel ? 'DL版の採点が完了しました。' : 'DLモデルを使わず表示しました。', dl.usedModel ? 'success' : '');
+        if (dl.engine === 'ml') {
+          setStatus(dl.usedModel ? 'DLが使えなかったため、ML補正で表示しました。' : 'DLとMLが使えなかったため、標準評価で表示しました。', dl.usedModel ? 'success' : '');
+        } else {
+          setStatus(dl.usedModel ? 'DL版の採点が完了しました。' : 'DLモデルを使わず表示しました。', dl.usedModel ? 'success' : '');
+        }
       } catch (error) {
         console.error(error);
         setStatus(error.message || 'DL版の採点に失敗しました', 'error');
