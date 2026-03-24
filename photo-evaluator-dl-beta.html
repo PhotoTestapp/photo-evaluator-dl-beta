@@ -419,6 +419,7 @@
       box-shadow: 0 22px 46px rgba(92, 122, 176, 0.16);
       backdrop-filter: blur(16px) saturate(150%);
       -webkit-backdrop-filter: blur(16px) saturate(150%);
+      margin-bottom: 4px;
     }
 
     .hero-label {
@@ -534,8 +535,10 @@
     .score-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 20px;
-      margin-top: 2px;
+      column-gap: 20px;
+      row-gap: 22px;
+      margin: 4px 0 2px;
+      padding: 2px 0;
     }
 
     .score-tile {
@@ -548,6 +551,7 @@
       box-shadow: var(--glass-shadow-soft);
       backdrop-filter: blur(12px) saturate(136%);
       -webkit-backdrop-filter: blur(12px) saturate(136%);
+      margin: 0;
     }
 
     .score-tile-head {
@@ -608,7 +612,7 @@
       box-shadow: var(--glass-shadow);
       backdrop-filter: blur(14px) saturate(145%);
       -webkit-backdrop-filter: blur(14px) saturate(145%);
-      margin-top: 2px;
+      margin-top: 6px;
     }
 
     .method-header {
@@ -981,6 +985,9 @@
       .comment-grid, .score-grid, .method-grid { grid-template-columns: 1fr; }
       .result-card {
         gap: 28px;
+      }
+      .score-grid {
+        row-gap: 18px;
       }
       .histogram-row,
       .genre-row,
