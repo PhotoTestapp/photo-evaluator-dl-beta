@@ -228,12 +228,16 @@
     .layout {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 30px;
+      gap: 38px;
       align-items: start;
     }
 
     .panel {
       padding: 28px;
+    }
+
+    .layout > .panel + .panel {
+      margin-top: 4px;
     }
 
     .section-title {
@@ -932,6 +936,9 @@
         font-size: 0.76rem;
       }
       .panel, .welcome-panel { padding: 22px; border-radius: var(--radius-lg); }
+      .layout {
+        gap: 32px;
+      }
       .page-title {
         font-size: 1.85rem;
       }
@@ -1003,6 +1010,9 @@
       .page { padding: 18px 12px 56px; }
       nav { padding: 0 12px; }
       .welcome-panel, .panel { padding: 18px; }
+      .layout {
+        gap: 26px;
+      }
       .step-card { padding: 16px; }
       .step-card h3 { font-size: 0.95rem; }
       .btn,
