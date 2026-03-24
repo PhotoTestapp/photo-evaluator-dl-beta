@@ -751,6 +751,14 @@
       padding: 28px;
     }
 
+    .layout + .panel {
+      margin-top: 56px;
+    }
+
+    .panel + .panel.stats-panel {
+      margin-top: 56px;
+    }
+
     .stats-panel .section-title {
       margin-bottom: 6px;
     }
@@ -939,6 +947,10 @@
       .layout {
         gap: 38px;
       }
+      .layout + .panel,
+      .panel + .panel.stats-panel {
+        margin-top: 42px;
+      }
       .page-title {
         font-size: 1.85rem;
       }
@@ -1012,6 +1024,10 @@
       .welcome-panel, .panel { padding: 18px; }
       .layout {
         gap: 32px;
+      }
+      .layout + .panel,
+      .panel + .panel.stats-panel {
+        margin-top: 34px;
       }
       .step-card { padding: 16px; }
       .step-card h3 { font-size: 0.95rem; }
