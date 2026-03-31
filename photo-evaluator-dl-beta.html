@@ -138,6 +138,10 @@
         inset 0 -1px 0 rgba(70, 108, 224, 0.38);
     }
 
+    .tab-panel.hidden {
+      display: none;
+    }
+
     .page {
       max-width: 860px;
       margin: 0 auto;
@@ -416,6 +420,46 @@
       margin-top: 24px;
       display: none;
       gap: 18px;
+    }
+
+    .api-switcher {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(245, 249, 255, 0.34));
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: var(--glass-shadow-soft);
+    }
+
+    .api-switcher-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .api-switcher-sub {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.7;
+    }
+
+    .api-switcher select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .api-switcher-note {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      word-break: break-all;
     }
 
     .preview-card {
@@ -835,6 +879,194 @@
       gap: 22px;
     }
 
+    .timeline-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-card {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 14px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.56);
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(244,248,255,0.34));
+      box-shadow: var(--glass-shadow-soft);
+      cursor: pointer;
+    }
+
+    .timeline-thumb {
+      width: 88px;
+      height: 88px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(241, 246, 255, 0.72);
+      border: 1px solid rgba(255,255,255,0.56);
+    }
+
+    .timeline-thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .timeline-body {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .timeline-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-date {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .timeline-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.54);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .timeline-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(16, 25, 43, 0.52);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 40;
+    }
+
+    .timeline-modal.open {
+      display: flex;
+    }
+
+    .timeline-modal-panel {
+      width: min(920px, 100%);
+      max-height: min(86vh, 980px);
+      overflow: auto;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.58);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(244,248,255,0.82));
+      box-shadow: 0 28px 80px rgba(50, 76, 123, 0.22);
+      padding: 28px;
+    }
+
+    .timeline-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .timeline-modal-title {
+      margin: 0;
+      font-size: 1.18rem;
+      color: var(--text);
+    }
+
+    .timeline-detail {
+      display: grid;
+      gap: 22px;
+    }
+
+    .timeline-detail-top {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .timeline-detail-thumb {
+      width: 180px;
+      aspect-ratio: 1 / 1;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.56);
+      background: rgba(241,246,255,0.78);
+      box-shadow: var(--glass-shadow-soft);
+    }
+
+    .timeline-detail-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .timeline-detail-meta {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-detail-date {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .timeline-detail-score {
+      font-size: clamp(2.6rem, 8vw, 4rem);
+      line-height: 0.94;
+      letter-spacing: -0.08em;
+      font-weight: 900;
+      color: #f0a20b;
+    }
+
+    .timeline-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .timeline-detail-box {
+      border: 1px solid rgba(255,255,255,0.56);
+      border-radius: 18px;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.52), rgba(244,248,255,0.34));
+      box-shadow: var(--glass-shadow-soft);
+    }
+
+    .timeline-detail-box strong {
+      display: block;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .timeline-detail-box span {
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
     .stats-block {
       position: relative;
       overflow: hidden;
@@ -1127,6 +1359,7 @@
       <div class="nav-tabs">
         <a class="tab-link active" href="./photo-evaluator-dl-beta.html">ベータ</a>
         <a class="tab-link" href="#global-stats">統計</a>
+        <a class="tab-link" href="#timeline">タイムライン</a>
       </div>
     </div>
   </nav>
@@ -1160,7 +1393,7 @@
       </div>
     </section>
 
-    <section class="layout">
+    <section class="layout tab-panel" data-panel="beta">
       <div class="panel">
         <h2 class="section-title">画像選択</h2>
         <p class="section-sub">評価に使う画像を1枚選びます。</p>
@@ -1183,13 +1416,24 @@
             </div>
           </div>
           <button id="eval-btn" class="btn btn-primary" type="button" disabled>写真を評価する</button>
+          <div class="api-switcher">
+            <div>
+              <p class="api-switcher-title">DL保存先</p>
+              <p class="api-switcher-sub">開発者版ハブへ反映したいときはローカルAPIを選びます。</p>
+            </div>
+            <select id="dl-api-target">
+              <option value="render">Render API</option>
+              <option value="local">ローカルAPI (127.0.0.1:8788)</option>
+            </select>
+            <div class="api-switcher-note" id="dl-api-target-note">現在の保存先を確認中です。</div>
+          </div>
           <div class="status-line" id="status-line"></div>
         </div>
       </div>
 
     </section>
 
-    <section class="panel" id="dl-stats">
+    <section class="panel tab-panel" id="dl-stats" data-panel="beta">
       <h2 class="section-title">採点結果</h2>
 
       <div id="result-empty" class="empty">画像を選んで `写真を評価する` を押すと、ここに採点結果が表示されます。</div>
@@ -1246,7 +1490,7 @@
       </div>
     </section>
 
-    <section class="panel stats-panel" id="global-stats">
+    <section class="panel stats-panel tab-panel hidden" id="global-stats" data-panel="stats">
       <h2 class="section-title">全ユーザーの統計</h2>
       <p class="stats-caption" id="global-stats-caption">統計データを読み込み中です。</p>
       <div class="stats-grid">
@@ -1265,7 +1509,7 @@
       </div>
     </section>
 
-    <section class="panel stats-panel" id="stats">
+    <section class="panel stats-panel tab-panel hidden" id="stats" data-panel="stats">
       <h2 class="section-title">あなたの統計</h2>
       <p class="stats-caption" id="local-stats-caption">この端末で評価した結果を表示します。</p>
       <div class="stats-grid">
@@ -1283,7 +1527,23 @@
         </section>
       </div>
     </section>
+
+    <section class="panel stats-panel tab-panel hidden" id="timeline" data-panel="timeline">
+      <h2 class="section-title">タイムライン</h2>
+      <p class="stats-caption" id="timeline-caption">この端末で保存したDL版の採点結果を新しい順に表示します。</p>
+      <div id="timeline-list" class="stats-empty">まだタイムラインはありません。</div>
+    </section>
   </main>
+
+  <div id="timeline-modal" class="timeline-modal" aria-hidden="true">
+    <div class="timeline-modal-panel" role="dialog" aria-modal="true" aria-labelledby="timeline-modal-title">
+      <div class="timeline-modal-head">
+        <h2 id="timeline-modal-title" class="timeline-modal-title">保存済みの採点結果</h2>
+        <button id="timeline-modal-close" class="ghost-btn" type="button">閉じる</button>
+      </div>
+      <div id="timeline-modal-body"></div>
+    </div>
+  </div>
 
   <script>
     const DL_API_STORAGE_KEY = 'photo_eval_dl_beta_api_base';
@@ -1314,10 +1574,19 @@
     const globalScoreAverages = document.getElementById('global-score-averages');
     const globalGenreCounts = document.getElementById('global-genre-counts');
     const globalStatsCaption = document.getElementById('global-stats-caption');
+    const dlApiTargetSelect = document.getElementById('dl-api-target');
+    const dlApiTargetNote = document.getElementById('dl-api-target-note');
     const statsTotalDistribution = document.getElementById('stats-total-distribution');
     const statsScoreAverages = document.getElementById('stats-score-averages');
     const statsGenreCounts = document.getElementById('stats-genre-counts');
     const localStatsCaption = document.getElementById('local-stats-caption');
+    const timelineCaption = document.getElementById('timeline-caption');
+    const timelineList = document.getElementById('timeline-list');
+    const timelineModal = document.getElementById('timeline-modal');
+    const timelineModalBody = document.getElementById('timeline-modal-body');
+    const timelineModalClose = document.getElementById('timeline-modal-close');
+    const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
+    const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
     let browserMlModelPromise = null;
     let currentPreviewObjectUrl = '';
 
@@ -1513,6 +1782,26 @@
       return normalizeDlApiBase(localStorage.getItem(DL_API_STORAGE_KEY) || DEFAULT_DL_API_BASE) || DEFAULT_DL_API_BASE;
     }
 
+    function getLocalDlApiBase() {
+      return normalizeDlApiBase('http://127.0.0.1:8788') || 'http://127.0.0.1:8788';
+    }
+
+    function updateDlApiTargetUi() {
+      if (!dlApiTargetSelect || !dlApiTargetNote) return;
+      const currentBase = getDlApiBase();
+      const isLocal = currentBase === getLocalDlApiBase();
+      dlApiTargetSelect.value = isLocal ? 'local' : 'render';
+      dlApiTargetNote.textContent = isLocal
+        ? `現在はローカルAPIへ保存します: ${currentBase}`
+        : `現在はRender APIへ保存します: ${currentBase}`;
+    }
+
+    function setDlApiTarget(target) {
+      const nextBase = target === 'local' ? getLocalDlApiBase() : DEFAULT_DL_API_BASE;
+      localStorage.setItem(DL_API_STORAGE_KEY, nextBase);
+      updateDlApiTargetUi();
+    }
+
     function getTier(score) {
       if (score >= 85) return 'high';
       if (score >= 60) return 'mid';
@@ -1526,6 +1815,49 @@
     function setStatus(message, kind = '') {
       statusLine.textContent = message;
       statusLine.className = kind ? `status-line ${kind}` : 'status-line';
+    }
+
+    function getActiveTabName() {
+      if (window.location.hash === '#global-stats' || window.location.hash === '#stats') return 'stats';
+      if (window.location.hash === '#timeline') return 'timeline';
+      return 'beta';
+    }
+
+    function updateActiveTabUi() {
+      const activeTab = getActiveTabName();
+      tabLinks.forEach(link => {
+        const href = link.getAttribute('href') || '';
+        const isActive = (
+          (activeTab === 'beta' && href === './photo-evaluator-dl-beta.html') ||
+          (activeTab === 'stats' && href === '#global-stats') ||
+          (activeTab === 'timeline' && href === '#timeline')
+        );
+        link.classList.toggle('active', isActive);
+      });
+      tabPanels.forEach(panel => {
+        panel.classList.toggle('hidden', panel.dataset.panel !== activeTab);
+      });
+    }
+
+    function switchToBetaTab() {
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+      updateActiveTabUi();
+    }
+
+    function openTimelineModal(contentHtml) {
+      timelineModalBody.innerHTML = contentHtml;
+      timelineModal.classList.add('open');
+      timelineModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTimelineModal() {
+      timelineModal.classList.remove('open');
+      timelineModal.setAttribute('aria-hidden', 'true');
+      timelineModalBody.innerHTML = '';
+      document.body.style.overflow = '';
     }
 
     async function apiRequest(path, options = {}) {
@@ -1671,6 +2003,20 @@
         width,
         height,
       };
+    }
+
+    async function createTimelineThumbnail(source) {
+      const image = await loadImageElement(source);
+      const longestSide = Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height);
+      const scale = Math.min(1, 180 / Math.max(1, longestSide));
+      const width = Math.max(48, Math.round((image.naturalWidth || image.width) * scale));
+      const height = Math.max(48, Math.round((image.naturalHeight || image.height) * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL('image/jpeg', 0.82);
     }
 
     function withTimeout(promise, ms, message) {
@@ -2346,6 +2692,57 @@
       renderBarList(statsGenreCounts, genreRows, 'genre');
     }
 
+    function renderTimeline(records = loadSavedStats()) {
+      if (!records.length) {
+        timelineCaption.textContent = 'この端末で保存したDL版の採点結果を新しい順に表示します。';
+        timelineList.textContent = 'まだタイムラインはありません。';
+        timelineList.className = 'stats-empty';
+        return;
+      }
+
+      const latestSavedAt = records[0]?.savedAt || '';
+      timelineCaption.textContent = formatStatsTimestamp(latestSavedAt)
+        ? `${formatStatsTimestamp(latestSavedAt)} 時点までの保存履歴`
+        : 'この端末で保存したDL版の採点結果を新しい順に表示します。';
+      timelineList.className = '';
+      timelineList.innerHTML = `
+        <div class="timeline-list">
+          ${records.slice(0, 30).map(record => {
+            const engineLabel = getSavedEngineLabel(record);
+            const genreLabel = GENRE_LABELS[record.genre] || 'その他';
+            const versionLabel = String(record.modelVersion || '').trim() || '未設定';
+            return `
+              <article
+                class="timeline-card"
+                role="button"
+                tabindex="0"
+                data-image-id="${record.imageId || ''}"
+                onclick="openTimelineRecord(this.dataset.imageId)"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTimelineRecord(this.dataset.imageId);}"
+              >
+                <div class="timeline-thumb">
+                  ${record.previewThumbSrc
+                    ? `<img src="${record.previewThumbSrc}" alt="保存済み結果のプレビュー">`
+                    : ''}
+                </div>
+                <div class="timeline-body">
+                  <div class="timeline-top">
+                    <span class="timeline-date">${formatStatsTimestamp(record.savedAt || record.createdAt) || '日時不明'}</span>
+                  </div>
+                  <div class="timeline-meta">
+                    <span class="timeline-chip">${round(Number(record.totalScore || 0), 1)}点</span>
+                    <span class="timeline-chip">${engineLabel}</span>
+                    <span class="timeline-chip">${genreLabel}</span>
+                    <span class="timeline-chip">${versionLabel}</span>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
     function normalizeAverageLabel(label) {
       return ({
         composition: '構図',
@@ -2488,7 +2885,138 @@
       }).join('');
     }
 
-    function renderResult(analysis, dl, savePayload = null) {
+    function getSavedEngineLabel(record) {
+      const engine = record.engine || 'rule';
+      const usedModel = record.usedModel !== false;
+      if (engine === 'dl' && usedModel) return 'DL評価';
+      if (engine === 'ml' && usedModel) return 'MLフォールバック';
+      return '標準評価';
+    }
+
+    function getSavedGenreMode(record) {
+      if (record.estimatedGenreMode) return record.estimatedGenreMode;
+      const engine = record.engine || 'rule';
+      const usedModel = record.usedModel !== false;
+      if (engine === 'dl' && usedModel) return 'DL分類';
+      if (engine === 'ml' && usedModel) return 'MLフォールバック';
+      return '標準推定';
+    }
+
+    function renderStoredResult(record) {
+      const totalScore = round(Number(record.totalScore || 0), 1);
+      const ruleScoreValue = record.ruleTotalScore;
+      const scoreDeltaValue = record.predictedDelta;
+      const engine = record.engine || 'rule';
+      const usedModel = record.usedModel !== false;
+      const genreCode = record.genre || 'other';
+      const estimatedGenreMode = getSavedGenreMode(record);
+      const scoreSnapshot = {
+        compositionScore: Number(record.compositionScore || 0),
+        lightScore: Number(record.lightScore || 0),
+        colorScore: Number(record.colorScore || 0),
+        technicalScore: Number(record.technicalScore || 0),
+        subjectScore: Number(record.subjectScore || 0),
+        impressionScore: Number(record.impressionScore || 0),
+        totalScore,
+      };
+
+      resultEmpty.style.display = 'none';
+      resultCard.style.display = 'block';
+      document.getElementById('rule-total-score').textContent = ruleScoreValue == null ? '-' : String(round(Number(ruleScoreValue), 1));
+      document.getElementById('dl-total-score').textContent = String(totalScore);
+      document.getElementById('dl-delta-score').textContent = scoreDeltaValue == null
+        ? '-'
+        : `${Number(scoreDeltaValue) > 0 ? '+' : ''}${round(Number(scoreDeltaValue), 1)}点`;
+      methodVersion.textContent = record.modelVersion || record.modelType || '未設定';
+      estimatedGenre.textContent = `${GENRE_LABELS[genreCode] || 'その他'}（${estimatedGenreMode}）`;
+
+      if (engine === 'ml') {
+        resultBadge.textContent = usedModel ? 'MLフォールバック' : '標準評価';
+        resultBadge.className = `badge ${usedModel ? 'amber' : 'red'}`;
+        methodBadge.textContent = usedModel ? 'ML補正あり' : '標準評価';
+        methodMode.textContent = usedModel ? 'MLフォールバック' : '標準評価';
+      } else if (engine === 'dl') {
+        resultBadge.textContent = usedModel ? 'DL推論あり' : 'DL未使用';
+        resultBadge.className = `badge ${usedModel ? 'green' : 'amber'}`;
+        methodBadge.textContent = usedModel ? 'DL推論あり' : 'DL未使用';
+        methodMode.textContent = usedModel ? 'DL評価' : '標準評価';
+      } else {
+        resultBadge.textContent = '保存済み結果';
+        resultBadge.className = 'badge amber';
+        methodBadge.textContent = '保存済み結果';
+        methodMode.textContent = '保存済み結果';
+      }
+
+      heroMeta.textContent = [
+        formatStatsTimestamp(record.savedAt || record.createdAt)
+          ? `${formatStatsTimestamp(record.savedAt || record.createdAt)} に保存`
+          : '',
+        record.sampleCount == null ? '' : `学習件数 ${Number(record.sampleCount || 0)}`,
+        record.validationMae == null ? '' : `検証MAE ${round(Number(record.validationMae), 3)}`,
+      ].filter(Boolean).join(' / ') || '保存済みの採点結果を表示しています。';
+      renderScoreGrid(scoreSnapshot);
+    }
+
+    function buildTimelineModalContent(record) {
+      const totalScore = round(Number(record.totalScore || 0), 1);
+      const ruleScoreValue = record.ruleTotalScore;
+      const scoreDeltaValue = record.predictedDelta;
+      const engine = record.engine || 'rule';
+      const engineLabel = getSavedEngineLabel(record);
+      const estimatedGenreMode = getSavedGenreMode(record);
+      const genreLabel = GENRE_LABELS[record.genre] || 'その他';
+      const metaChips = [
+        `${genreLabel}（${estimatedGenreMode}）`,
+        record.modelVersion || record.modelType || '未設定',
+        record.sampleCount == null ? '' : `学習件数 ${Number(record.sampleCount || 0)}`,
+        record.validationMae == null ? '' : `検証MAE ${round(Number(record.validationMae), 3)}`,
+      ].filter(Boolean);
+
+      return `
+        <div class="timeline-detail">
+          <div class="timeline-detail-top">
+            <div class="timeline-detail-thumb">
+              ${record.previewThumbSrc ? `<img src="${record.previewThumbSrc}" alt="保存済み結果のプレビュー">` : ''}
+            </div>
+            <div class="timeline-detail-meta">
+              <div class="timeline-detail-date">${formatStatsTimestamp(record.savedAt || record.createdAt) || '日時不明'}</div>
+              <div class="timeline-detail-score">${totalScore}<span style="font-size:1.05rem;color:var(--text-dim);font-weight:700;margin-left:8px;">/100</span></div>
+              <div class="timeline-meta">
+                <span class="timeline-chip">${engineLabel}</span>
+                ${metaChips.map(item => `<span class="timeline-chip">${item}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="timeline-detail-grid">
+            <div class="timeline-detail-box">
+              <strong>標準の総合点</strong>
+              <span>${ruleScoreValue == null ? '-' : round(Number(ruleScoreValue), 1)}</span>
+            </div>
+            <div class="timeline-detail-box">
+              <strong>自動調整</strong>
+              <span>${scoreDeltaValue == null ? '-' : `${Number(scoreDeltaValue) > 0 ? '+' : ''}${round(Number(scoreDeltaValue), 1)}点`}</span>
+            </div>
+            <div class="timeline-detail-box">
+              <strong>現在のチェック方式</strong>
+              <span>${engineLabel}</span>
+            </div>
+            ${SCORE_ITEMS.map(item => `<div class="timeline-detail-box"><strong>${item.label}</strong><span>${round(Number(record[item.key] || 0), 1)}</span></div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openTimelineRecord(imageId) {
+      const records = loadSavedStats();
+      const record = records.find(item => item.imageId === imageId);
+      if (!record) {
+        setStatus('保存済み結果を読み込めませんでした。', 'error');
+        return;
+      }
+      openTimelineModal(buildTimelineModalContent(record));
+    }
+
+    function renderResult(analysis, dl, savePayload = null, timelineThumbDataUrl = '') {
       const ruleScore = Number(analysis.scores.totalScore || 0);
       const compareLabel = dl.engine === 'ml' ? 'ML' : 'DL';
       const scoreDelta = round(Number(dl.predictedDelta || (Number(dl.predictedTotalScore || ruleScore) - ruleScore)), 1);
@@ -2539,7 +3067,11 @@
         savedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         imageId: `dl-beta-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+        previewThumbSrc: timelineThumbDataUrl,
         engine: dl.engine || 'rule',
+        usedModel: dl.usedModel !== false,
+        ruleTotalScore: ruleScore,
+        predictedDelta: scoreDelta,
         totalScore: Number(dlScores.totalScore || 0),
         compositionScore: Number(dlScores.compositionScore || 0),
         lightScore: Number(dlScores.lightScore || 0),
@@ -2548,6 +3080,10 @@
         subjectScore: Number(dlScores.subjectScore || 0),
         impressionScore: Number(dlScores.impressionScore || 0),
         genre: estimatedGenreCode,
+        estimatedGenreMode,
+        sampleCount: dl.sampleCount ?? 0,
+        validationMae: dl.validationMae == null ? null : Number(dl.validationMae),
+        modelType: dl.modelType || '',
         modelVersion: dl.modelVersion || dl.modelType || '',
       };
       const savedRecord = {
@@ -2558,6 +3094,9 @@
       };
       saveStatsRecord(localStatsRecord);
       renderStats();
+      if (window.location.hash === '#timeline') {
+        renderTimeline();
+      }
       void saveGlobalEvaluation(savedRecord);
       return {
         dlScores,
@@ -2580,9 +3119,10 @@
         setStatus('画像を解析しています...');
         const analysis = await analyzeImageFile(currentFile, imageSource);
         const dlSafeImageDataUrl = await convertToDlSafeDataUrl(imageSource);
-        const [browserExifMetadata, originalFileHeaderBase64] = await Promise.all([
+        const [browserExifMetadata, originalFileHeaderBase64, timelineThumbDataUrl] = await Promise.all([
           extractExifMetadataFromFile(currentFile),
           readFileHeadAsBase64(currentFile).catch(() => ''),
+          createTimelineThumbnail(imageSource).catch(() => ''),
         ]);
         const ruleScore = Math.round(Number(analysis.scores.totalScore || 0));
         let dl;
@@ -2606,7 +3146,7 @@
             mimeType: currentFile.type || '',
             size: Number(currentFile.size || 0),
           },
-        });
+        }, timelineThumbDataUrl);
         if (dl.engine === 'ml') {
           setStatus(dl.usedModel ? 'DLが使えなかったため、ML補正で表示しました。' : 'DLとMLが使えなかったため、標準評価で表示しました。', dl.usedModel ? 'success' : '');
         } else {
@@ -2628,7 +3168,16 @@
       }
     }
 
-    localStorage.setItem(DL_API_STORAGE_KEY, DEFAULT_DL_API_BASE);
+    if (!normalizeDlApiBase(localStorage.getItem(DL_API_STORAGE_KEY))) {
+      localStorage.setItem(DL_API_STORAGE_KEY, DEFAULT_DL_API_BASE);
+    }
+    updateDlApiTargetUi();
+
+    if (dlApiTargetSelect) {
+      dlApiTargetSelect.addEventListener('change', event => {
+        setDlApiTarget(event.target.value);
+      });
+    }
 
     previewImage.addEventListener('error', () => {
       setStatus('プレビュー表示に失敗しましたが、画像は選択されています。DL版で評価は実行できます。', 'error');
@@ -2663,8 +3212,41 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    timelineModalClose.addEventListener('click', () => {
+      closeTimelineModal();
+    });
+
+    timelineModal.addEventListener('click', event => {
+      if (event.target === timelineModal) {
+        closeTimelineModal();
+      }
+    });
+
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && timelineModal.classList.contains('open')) {
+        closeTimelineModal();
+      }
+    });
+
+    window.addEventListener('hashchange', () => {
+      updateActiveTabUi();
+      if (window.location.hash === '#global-stats') {
+        void renderGlobalStats();
+      }
+      if (window.location.hash === '#stats') {
+        renderStats();
+      }
+      if (window.location.hash === '#timeline') {
+        renderTimeline();
+      }
+    });
+
+    updateActiveTabUi();
     void renderGlobalStats();
     renderStats();
+    if (window.location.hash === '#timeline') {
+      renderTimeline();
+    }
     void refreshApiStatus();
   </script>
 </body>
