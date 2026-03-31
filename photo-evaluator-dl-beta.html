@@ -1294,11 +1294,12 @@
         align-items: flex-start;
         flex-direction: column;
       }
-      .comment-grid, .score-grid, .method-grid { grid-template-columns: 1fr; }
+      .comment-grid, .method-grid { grid-template-columns: 1fr; }
       .result-card {
         gap: 34px;
       }
       .score-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: 22px;
         margin: 6px 0 2px;
       }
@@ -1366,32 +1367,6 @@
 
   <main class="page">
     <h1 class="page-title">写真チェックアプリベータ</h1>
-
-    <section class="welcome-panel">
-      <div class="step-grid">
-        <article class="step-card">
-          <div class="step-head">
-            <span class="step-num">1</span>
-            <h3>画像を選ぶ</h3>
-          </div>
-          <p>スマホやパソコンにある写真を1枚選ぶだけです。</p>
-        </article>
-        <article class="step-card">
-          <div class="step-head">
-            <span class="step-num">2</span>
-            <h3>評価する</h3>
-          </div>
-          <p>総合点と項目別スコアを取得します。</p>
-        </article>
-        <article class="step-card">
-          <div class="step-head">
-            <span class="step-num">3</span>
-            <h3>結果を見る</h3>
-          </div>
-          <p>結果を確認できます。</p>
-        </article>
-      </div>
-    </section>
 
     <section class="layout tab-panel" data-panel="beta">
       <div class="panel">
