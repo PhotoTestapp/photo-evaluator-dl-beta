@@ -10,7 +10,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>写真チェックアプリベータ | Photo Eval Beta</title>
+  <title>写真チェックアプリ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -1008,6 +1008,27 @@
       line-height: 1.75;
     }
 
+    .timeline-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .timeline-count {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .timeline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1107,6 +1128,19 @@
       color: #3c5786;
       font-size: 0.8rem;
       font-weight: 800;
+    }
+
+    .timeline-delete-btn {
+      appearance: none;
+      border: 1px solid rgba(228, 129, 129, 0.42);
+      background: rgba(255, 236, 236, 0.96);
+      color: #b24a4a;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .timeline-modal {
@@ -1525,9 +1559,9 @@
 <body>
   <nav>
     <div class="nav-inner">
-      <div class="nav-logo">📸 <span>PHOTO</span>EVAL</div>
+      <div class="nav-logo">📸 <span>PHOTO</span>EVAL（β）</div>
       <div class="nav-tabs">
-        <a class="tab-link active" href="./photo-evaluator-dl-beta.html">ベータ</a>
+        <a class="tab-link active" href="./photo-evaluator-dl-beta.html">DL版</a>
         <a class="tab-link" href="#global-stats">統計</a>
         <a class="tab-link" href="#timeline">タイムライン</a>
       </div>
@@ -1535,7 +1569,7 @@
   </nav>
 
   <main class="page">
-    <h1 class="page-title">写真チェックアプリベータ</h1>
+    <h1 class="page-title">写真チェックアプリ</h1>
 
     <section class="layout tab-panel" data-panel="beta">
       <div class="panel">
@@ -1610,7 +1644,7 @@
         <section class="method-card">
           <div class="method-header">
             <div class="method-title">結果の出し方</div>
-            <span class="badge" id="method-badge">DLベータ</span>
+            <span class="badge" id="method-badge">DL版</span>
           </div>
           <div class="method-grid">
             <div class="method-box">
@@ -1722,6 +1756,12 @@
     <section class="panel stats-panel tab-panel hidden" id="timeline" data-panel="timeline">
       <h2 class="section-title">タイムライン</h2>
       <p class="stats-caption" id="timeline-caption">この端末で保存したDL版の採点結果を新しい順に表示します。</p>
+      <div class="timeline-toolbar">
+        <span class="timeline-count" id="timeline-count">0件</span>
+        <div class="timeline-actions">
+          <button id="clear-timeline-btn" class="ghost-btn" type="button">全件削除</button>
+        </div>
+      </div>
       <div id="timeline-list" class="stats-empty">まだタイムラインはありません。</div>
     </section>
   </main>
@@ -1775,7 +1815,9 @@
     const statsGenreCounts = document.getElementById('stats-genre-counts');
     const localStatsCaption = document.getElementById('local-stats-caption');
     const timelineCaption = document.getElementById('timeline-caption');
+    const timelineCount = document.getElementById('timeline-count');
     const timelineList = document.getElementById('timeline-list');
+    const clearTimelineButton = document.getElementById('clear-timeline-btn');
     const queueWrap = document.getElementById('queue-wrap');
     const queueGrid = document.getElementById('queue-grid');
     const timelineModal = document.getElementById('timeline-modal');
@@ -2833,6 +2875,10 @@
       return next;
     }
 
+    function overwriteSavedStats(records) {
+      localStorage.setItem(DL_BETA_STATS_STORAGE_KEY, JSON.stringify(Array.isArray(records) ? records : []));
+    }
+
     function openSourceImageDb() {
       if (!sourceImageDbPromise) {
         sourceImageDbPromise = new Promise((resolve, reject) => {
@@ -2870,6 +2916,26 @@
         const request = tx.objectStore(DL_BETA_SOURCE_STORE_NAME).get(imageId);
         request.onsuccess = () => resolve(request.result || null);
         request.onerror = () => reject(request.error || new Error('indexedDB read failed'));
+      });
+    }
+
+    async function deleteSourceImageRecord(imageId) {
+      const db = await openSourceImageDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(DL_BETA_SOURCE_STORE_NAME, 'readwrite');
+        tx.objectStore(DL_BETA_SOURCE_STORE_NAME).delete(imageId);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error || new Error('indexedDB delete failed'));
+      });
+    }
+
+    async function clearSourceImageRecords() {
+      const db = await openSourceImageDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(DL_BETA_SOURCE_STORE_NAME, 'readwrite');
+        tx.objectStore(DL_BETA_SOURCE_STORE_NAME).clear();
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error || new Error('indexedDB clear failed'));
       });
     }
 
@@ -2923,6 +2989,7 @@
 
     window.selectQueueItem = selectQueueItem;
     window.openTimelineRecord = openTimelineRecord;
+    window.deleteTimelineRecord = deleteTimelineRecord;
 
     function renderBarList(container, rows, kind) {
       const maxCount = Math.max(...rows.map(row => row.count), 1);
@@ -3031,6 +3098,7 @@
     }
 
     function renderTimeline(records = loadSavedStats()) {
+      if (timelineCount) timelineCount.textContent = `${records.length}件`;
       if (!records.length) {
         timelineCaption.textContent = 'この端末で保存したDL版の採点結果を新しい順に表示します。';
         timelineList.textContent = 'まだタイムラインはありません。';
@@ -3040,7 +3108,7 @@
 
       const latestSavedAt = records[0]?.savedAt || '';
       timelineCaption.textContent = formatStatsTimestamp(latestSavedAt)
-        ? `${formatStatsTimestamp(latestSavedAt)} 時点までの保存履歴`
+        ? `${formatStatsTimestamp(latestSavedAt)} 時点までの写真評価履歴`
         : 'この端末で保存したDL版の採点結果を新しい順に表示します。';
       timelineList.className = '';
       timelineList.innerHTML = `
@@ -3086,6 +3154,7 @@
                     <span class="timeline-chip">${genreLabel}</span>
                     ${scoreFeedbackLabel ? `<span class="timeline-chip">${scoreFeedbackLabel}</span>` : ''}
                     ${genreFeedbackLabel ? `<span class="timeline-chip">${genreFeedbackLabel}</span>` : ''}
+                    <button type="button" class="timeline-delete-btn" onclick="deleteTimelineRecord('${record.imageId || ''}', event)">削除</button>
                   </div>
                 </div>
               </article>
@@ -3093,6 +3162,43 @@
           }).join('')}
         </div>
       `;
+    }
+
+    async function deleteTimelineRecord(imageId, event) {
+      event?.stopPropagation?.();
+      if (!imageId) return;
+      if (!confirm('この写真評価履歴を削除しますか？')) return;
+      const nextRecords = loadSavedStats().filter(item => item.imageId !== imageId);
+      overwriteSavedStats(nextRecords);
+      try {
+        await deleteSourceImageRecord(imageId);
+      } catch (error) {
+        console.warn('Failed to delete source image record', error);
+      }
+      if (latestDlResultRecord?.imageId === imageId) {
+        latestDlResultRecord = null;
+        syncDlFeedbackUi();
+      }
+      renderStats(nextRecords);
+      renderTimeline(nextRecords);
+      closeTimelineModal();
+    }
+
+    async function clearTimelineRecords() {
+      const records = loadSavedStats();
+      if (!records.length) return;
+      if (!confirm('写真評価履歴をすべて削除しますか？')) return;
+      overwriteSavedStats([]);
+      try {
+        await clearSourceImageRecords();
+      } catch (error) {
+        console.warn('Failed to clear source image records', error);
+      }
+      latestDlResultRecord = null;
+      syncDlFeedbackUi();
+      renderStats([]);
+      renderTimeline([]);
+      closeTimelineModal();
     }
 
     function normalizeAverageLabel(label) {
@@ -3678,6 +3784,12 @@
     if (saveDlFeedbackButton) {
       saveDlFeedbackButton.addEventListener('click', () => {
         void saveDlFeedback();
+      });
+    }
+
+    if (clearTimelineButton) {
+      clearTimelineButton.addEventListener('click', () => {
+        void clearTimelineRecords();
       });
     }
 
